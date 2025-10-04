@@ -1,4 +1,4 @@
-package com.pm.bankcards.repository;
+package com.pm.bankcards.entity;
 
 public enum CardStatus {
     ACTIVE, BLOCKED, EXPIRED
