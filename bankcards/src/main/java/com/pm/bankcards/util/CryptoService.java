@@ -15,11 +15,11 @@ public class CryptoService {
     private static final int IV_SIZE = 12;
     private static final int TAG_LENGTH = 128;
 
-    private final byte[] keyBytes;
+    private final byte[] key;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public CryptoService(@Value("${security.enc.key}") String base64Key) {
-        this.keyBytes = Base64.getDecoder().decode(base64Key);
+        this.key = Base64.getDecoder().decode(base64Key);
     }
 
     public String encrypt(String plain) {
@@ -28,7 +28,7 @@ public class CryptoService {
             secureRandom.nextBytes(iv);
             Cipher cipher = Cipher.getInstance(ALGO);
             cipher.init(Cipher.ENCRYPT_MODE,
-                    new SecretKeySpec(keyBytes, "AES"),
+                    new SecretKeySpec(key, "AES"),
                     new GCMParameterSpec(TAG_LENGTH, iv));
 
             byte[] encrypted = cipher.doFinal(plain.getBytes());
@@ -51,7 +51,7 @@ public class CryptoService {
             System.arraycopy(combined, IV_SIZE, encrypted, 0, encrypted.length);
             Cipher cipher = Cipher.getInstance(ALGO);
             cipher.init(Cipher.DECRYPT_MODE,
-                    new SecretKeySpec(keyBytes, "AES"),
+                    new SecretKeySpec(key, "AES"),
                     new GCMParameterSpec(TAG_LENGTH, iv));
 
             return new String(cipher.doFinal(encrypted));
