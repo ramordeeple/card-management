@@ -1,4 +1,4 @@
-package com.pm.bankcards.dto.Transfer;
+package com.pm.bankcards.dto.transfer;
 
 public enum TransferSide {
     FROM,
