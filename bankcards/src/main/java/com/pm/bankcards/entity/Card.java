@@ -33,7 +33,7 @@ public class Card {
     @Column(nullable = false, length = 16)
     private CardStatus status = CardStatus.ACTIVE;
 
-    private BigDecimal balance =  BigDecimal.ZERO;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Version
     private long version;
