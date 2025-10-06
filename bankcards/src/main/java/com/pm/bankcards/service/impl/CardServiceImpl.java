@@ -11,9 +11,9 @@ import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.spec.CardSpecifications;
 import com.pm.bankcards.service.api.CardAdminService;
 import com.pm.bankcards.service.api.CardQueryService;
-import com.pm.bankcards.util.CardMasker;
 import com.pm.bankcards.util.Specs;
 import com.pm.bankcards.entity.Card;
+import com.pm.bankcards.mapper.CardMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,16 +28,19 @@ import java.util.Map;
 public class CardServiceImpl implements CardQueryService, CardAdminService {
 
     private final CardRepository cards;
+    private final CardMapper mapper;
 
-    public CardServiceImpl(CardRepository cards) {
+    public CardServiceImpl(CardRepository cards, CardMapper mapper) {
         this.cards = cards;
+        this.mapper = mapper;
     }
 
     @Transactional
     @Override
     public Page<CardResponse> findMyCards(Long currentUserId, Pageable pageable, CardFilter filter) {
-        var status = (filter != null) ? filter.status() : null;
-        var last4 = (filter != null) ? filter.last4() : null;
+        var status = filter != null ? filter.status() : null;
+        var last4 = (filter != null && filter.last4() != null &&
+                !filter.last4().isBlank()) ? filter.last4() : null;
         var expiryYear = (filter != null) ? filter.expiryYear() : null;
 
         Specification<Card> spec = Specs.compose(
@@ -47,7 +50,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
             CardSpecifications.expiryYear(expiryYear)
         );
 
-        return cards.findAll(spec, pageable).map(this::toDto);
+        return cards.findAll(spec, pageable).map(mapper::toDto);
     }
 
     @Transactional
@@ -79,7 +82,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         card.setLast4(req.number().substring(req.number().length() - 4));
         cards.save(card);
 
-        return toDto(card);
+        return mapper.toDto(card);
     }
 
     @Transactional
@@ -102,15 +105,4 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         card.activate();
     }
 
-    private CardResponse toDto(Card c) {
-        return new CardResponse(
-                c.getId(),
-                CardMasker.mask(c.getLast4()),
-                c.getOwner().getUsername(),
-                c.getExpiryMonth(),
-                c.getExpiryYear(),
-                c.getStatus(),
-                c.getBalance()
-        );
-    }
 }
