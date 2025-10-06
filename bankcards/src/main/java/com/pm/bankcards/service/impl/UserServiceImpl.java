@@ -5,6 +5,7 @@ import com.pm.bankcards.dto.user.UserResponse;
 import com.pm.bankcards.entity.Role;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
+import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.RoleRepository;
 import com.pm.bankcards.repository.UserRepository;
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse create(UserCreateRequest req) {
         if (users.existsByUsername(req.username()))
-            throw new BusinessException("username_taken", "Username already exists", Map.of("username", req.username()));
+            throw new BusinessException(ErrorCodes.USERNAME_TAKEN, "Username already exists", Map.of("username", req.username()));
 
         Role role = roles.findByName("USER")
                 .orElseThrow(() -> new NotFoundException("User role not found"));
