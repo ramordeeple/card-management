@@ -6,6 +6,7 @@ import com.pm.bankcards.dto.card.CardResponse;
 import com.pm.bankcards.entity.CardStatus;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
+import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.spec.CardSpecifications;
@@ -14,12 +15,12 @@ import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.util.Specs;
 import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.mapper.CardMapper;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
                 .orElseThrow(() -> new NotFoundException("Card not found or does not belong to you"));
 
         if (card.getStatus() == CardStatus.BLOCKED)
-            throw new BusinessException("already_blocked", "Card is blocked already", Map.of("cardId", cardId));
+            throw new BusinessException(ErrorCodes.CARD_ALREADY_BLOCKED, "Card is blocked already", Map.of("cardId", cardId));
 
         card.block();
     }

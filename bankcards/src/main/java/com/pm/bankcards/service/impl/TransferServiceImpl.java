@@ -10,8 +10,8 @@ import com.pm.bankcards.service.api.TransferService;
 import com.pm.bankcards.service.rules.TransferContext;
 import com.pm.bankcards.service.rules.TransferRule;
 import com.pm.bankcards.entity.Card;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;

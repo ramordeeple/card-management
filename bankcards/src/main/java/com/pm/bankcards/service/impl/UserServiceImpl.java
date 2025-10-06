@@ -10,9 +10,9 @@ import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.RoleRepository;
 import com.pm.bankcards.repository.UserRepository;
 import com.pm.bankcards.service.api.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Set;
