@@ -106,4 +106,14 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         card.activate();
     }
 
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void delete(Long cardId) {
+        if (!cards.existsById(cardId))
+            throw new NotFoundException("Card not found");
+
+        cards.deleteById(cardId);
+    }
+
 }
