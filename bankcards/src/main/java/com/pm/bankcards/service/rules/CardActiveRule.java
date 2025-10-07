@@ -4,24 +4,24 @@ import com.pm.bankcards.dto.transfer.TransferSide;
 import com.pm.bankcards.entity.CardStatus;
 import com.pm.bankcards.exception.CardNotActiveException;
 import org.springframework.stereotype.Component;
+import com.pm.bankcards.entity.Card;
 
 @Component
 public class CardActiveRule implements TransferRule {
 
     @Override
     public void check(TransferContext ctx) {
-        if (ctx.from().getStatus() != CardStatus.ACTIVE)
-            throw new CardNotActiveException(
-                    ctx.from().getId(),
-                    TransferSide.FROM,
-                    ctx.from().getStatus().name()
-            );
+        validateActive(ctx.from(), TransferSide.FROM);
+        validateActive(ctx.to(), TransferSide.TO);
+    }
 
-        if (ctx.to().getStatus() != CardStatus.ACTIVE)
+    private void validateActive(Card card, TransferSide side) {
+        if (card.getStatus() != CardStatus.ACTIVE) {
             throw new CardNotActiveException(
-                    ctx.to().getId(),
-                    TransferSide.TO,
-                    ctx.to().getStatus().name()
+                    card.getId(),
+                    side,
+                    card.getStatus().name()
             );
+        }
     }
 }
