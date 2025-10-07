@@ -39,4 +39,9 @@ public class AdminCardController {
     public void block(@PathVariable Long id) {
         cards.block(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        cards.delete(id);
+    }
 }
