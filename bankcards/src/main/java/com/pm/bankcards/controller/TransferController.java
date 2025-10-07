@@ -7,6 +7,7 @@ import com.pm.bankcards.security.AuthUser;
 import com.pm.bankcards.service.api.TransferService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,7 @@ public class TransferController {
         this.transfers = transfers;
     }
 
+    @PostMapping("/own")
     public TransferResponse ownTransfer(
             @AuthenticationPrincipal AuthUser me,
             @Valid @RequestBody TransferRequest req)
