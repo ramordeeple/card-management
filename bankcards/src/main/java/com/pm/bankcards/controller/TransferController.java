@@ -5,6 +5,9 @@ import com.pm.bankcards.dto.transfer.TransferResponse;
 import com.pm.bankcards.entity.Transfer;
 import com.pm.bankcards.security.AuthUser;
 import com.pm.bankcards.service.api.TransferService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 
+
+@Tag(name = "Transfers", description = "Переводы между своими картами")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/transfers")
 public class TransferController {
@@ -23,6 +29,7 @@ public class TransferController {
         this.transfers = transfers;
     }
 
+    @Operation(summary = "Перевод между своими картами (идемпотентный по requestId")
     @PostMapping("/own")
     public TransferResponse ownTransfer(
             @AuthenticationPrincipal AuthUser me,
