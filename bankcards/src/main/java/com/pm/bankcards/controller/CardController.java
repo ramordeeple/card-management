@@ -26,7 +26,7 @@ public class CardController {
     }
 
     @GetMapping
-    public Page<CardResponse> findMycards(
+    public Page<CardResponse> findMyCards(
             @AuthenticationPrincipal AuthUser me,
             CardFilter filter,
             Pageable pageable
