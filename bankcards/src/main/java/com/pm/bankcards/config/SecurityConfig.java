@@ -1,5 +1,6 @@
-package com.pm.bankcards.security;
+package com.pm.bankcards.config;
 
+import com.pm.bankcards.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
