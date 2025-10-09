@@ -24,7 +24,10 @@ public class Card {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @Column(name = "expiry_month", nullable = false)
     private int expiryMonth;
+
+    @Column(name = "expiry_year", nullable = false)
     private int expiryYear;
 
     @Enumerated(EnumType.STRING)
