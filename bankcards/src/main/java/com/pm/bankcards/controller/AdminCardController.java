@@ -32,7 +32,7 @@ public class AdminCardController {
     @PostMapping
     public CardResponse create(@Valid @RequestBody CardCreateRequest req) {
         User owner = users.findById(req.ownerId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
         return cards.create(req, owner);
     }

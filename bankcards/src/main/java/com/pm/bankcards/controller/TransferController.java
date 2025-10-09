@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 
-
 @Tag(name = "Transfers", description = "Переводы между своими картами")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
