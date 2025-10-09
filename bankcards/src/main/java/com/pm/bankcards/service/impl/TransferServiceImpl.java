@@ -4,6 +4,7 @@ package com.pm.bankcards.service.impl;
 import com.pm.bankcards.dto.transfer.TransferRequest;
 import com.pm.bankcards.entity.Transfer;
 import com.pm.bankcards.exception.BusinessException;
+import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.TransferRepository;
 import com.pm.bankcards.service.api.TransferService;
@@ -33,17 +34,16 @@ public class TransferServiceImpl implements TransferService {
         this.rules = rules;
     }
 
-
     @Override
     public Transfer doOwnTransfer(TransferRequest req, Long currentUserId) {
         if (transfers.existsByRequestId(req.requestId()))
             return transfers.findByRequestId(req.requestId()).orElseThrow();
 
         Card from = cards.lockByIdAndOwnerId(req.fromCardId(), currentUserId)
-                .orElseThrow(() -> new BusinessException("card_not_found", "Sender's card not found", Map.of("side", "FROM")));
+                .orElseThrow(() -> new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта отправителя не найдена", Map.of("side", "FROM")));
 
         Card to = cards.lockByIdAndOwnerId(req.toCardId(), currentUserId)
-                .orElseThrow(() -> new BusinessException("card_not_found", "Receiver's card not found", Map.of("side", "TO")));
+                .orElseThrow(() -> new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта получателя не найдена", Map.of("side", "TO")));
 
         TransferContext ctx = new TransferContext(from, to, req.amount(), req.requestId());
 

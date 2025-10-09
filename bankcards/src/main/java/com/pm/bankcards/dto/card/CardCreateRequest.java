@@ -7,7 +7,7 @@ public record CardCreateRequest(
         @Schema(example = "4111111111114242",
         description = "Полный номер карты")
         @NotBlank
-        @Pattern(regexp = "\\d{16}", message = "Card number should contain 16 digits")
+        @Pattern(regexp = "\\d{16}", message = "Карта должна содержать 16 цифр")
         String number,
 
         @Schema(example = "12", description = "Месяц истечения срока карты(1-12)")
