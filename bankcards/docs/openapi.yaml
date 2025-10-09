@@ -1,0 +1,543 @@
+openapi: 3.0.1
+info:
+  title: Bankcards API
+  description: |
+    Система управления картами: CRUD, переводы, фильтры/пагинация, JWT.
+  contact:
+    name: ramordeeple
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  version: v1
+servers:
+- url: http://localhost:8080
+  description: Dev
+- url: https://bankcards.com
+  description: Production
+tags:
+- name: Cards
+  description: Операции с собственными картами
+- name: Admin Users
+  description: Управление пользователями (админ)
+- name: Auth
+  description: Аутентификация
+- name: Admin cards
+  description: Администрирование карт
+paths:
+  /api/v1/cards/{id}/block:
+    post:
+      tags:
+      - Cards
+      summary: Запросить блокировку карты
+      operationId: requestBlock
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "401":
+          description: Неавторизован
+        "404":
+          description: Карта не найдена
+        "403":
+          description: Нет прав
+        "204":
+          description: Запрос принят
+      security:
+      - bearerAuth: []
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Вход в систему (без авторизации)
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /api/v1/admin/users:
+    post:
+      tags:
+      - Admin Users
+      summary: Создать пользователя
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards:
+    post:
+      tags:
+      - Admin cards
+      summary: Создать карту пользователя
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CardResponse"
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards/{id}/block:
+    post:
+      tags:
+      - Admin cards
+      summary: Заблокировать карту (админ)
+      operationId: block
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards/{id}/activate:
+    post:
+      tags:
+      - Admin cards
+      summary: Активировать карту (админ)
+      operationId: activate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      security:
+      - bearerAuth: []
+  /api/v1/cards:
+    get:
+      tags:
+      - Cards
+      summary: Список карт (фильтры + пагинация)
+      operationId: findMyCards
+      parameters:
+      - name: last4
+        in: query
+        description: Последние 4 цифры карты
+        required: false
+        schema:
+          type: string
+          description: Последние 4 цифры карты
+          example: 4242
+        example: 4242
+      - name: status
+        in: query
+        description: Статус карты
+        required: false
+        schema:
+          type: string
+          description: Статус карты
+          example: ACTIVE
+        example: ACTIVE
+      - name: expiryYear
+        in: query
+        description: Год истечения срока карты
+        required: false
+        schema:
+          type: string
+          description: Год истечения срока карты
+          example: 2030
+        example: 2030
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+          default: 20
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageCardResponse"
+        "401":
+          description: Неавторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageCardResponse"
+        "403":
+          description: Нет прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageCardResponse"
+      security:
+      - bearerAuth: []
+  /api/v1/cards/{id}/balance:
+    get:
+      tags:
+      - Cards
+      summary: Баланс карты
+      operationId: balance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceResponse"
+        "401":
+          description: Неавторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceResponse"
+        "404":
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceResponse"
+        "403":
+          description: Нет прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceResponse"
+      security:
+      - bearerAuth: []
+  /api/v1/auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Проверка токена (требует авторизации)
+      operationId: me
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+      security:
+      - bearerAuth: []
+  /api/v1/admin/cards/{id}:
+    delete:
+      tags:
+      - Admin cards
+      summary: Удалить карту (админ)
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    LoginRequest:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+          example: admin
+        password:
+          type: string
+          description: Пароль
+          example: admin
+      description: Запрос на вход
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT токен для авторизации
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type:
+          type: string
+          description: Тип токена (обычно 'Bearer'
+          example: Bearer
+      description: Ответ с JWT-токеном
+    UserCreateRequest:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя пользователя
+          example: Bob
+        password:
+          maxLength: 2147483647
+          minLength: 8
+          type: string
+          description: Пароль
+          example: qwerty123
+      description: Создание пользователя (админ)
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID пользователя
+          format: int64
+          example: 2
+        username:
+          type: string
+          description: Имя пользователя
+          example: Patrick
+        roles:
+          uniqueItems: true
+          type: array
+          description: "Роли (админ, пользователь)"
+          example:
+          - USER
+          items:
+            type: string
+            description: "Роли (админ, пользователь)"
+            example: "[\"USER\"]"
+        enabled:
+          type: boolean
+          description: Активирован ли пользователь
+          example: true
+      description: Информация о пользователе
+    CardCreateRequest:
+      required:
+      - number
+      - ownerId
+      type: object
+      properties:
+        number:
+          pattern: "\\d{16}"
+          type: string
+          description: Полный номер карты
+          example: "4111111111114242"
+        expiryMonth:
+          maximum: 12
+          minimum: 1
+          type: integer
+          description: Месяц истечения срока карты(1-12)
+          format: int32
+          example: 12
+        expiryYear:
+          minimum: 2024
+          type: integer
+          description: Год истечения срока карты
+          format: int32
+          example: 2030
+        ownerId:
+          type: integer
+          description: ID владельца (пользователя)
+          format: int64
+          example: 2
+    CardResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID карты
+          format: int64
+          example: 42
+        maskedNumber:
+          type: string
+          description: Маскированный номер карты
+          example: '**** **** **** 4242'
+        ownerUsername:
+          type: string
+          description: Имя владельца карты
+          example: Alice
+        expiryMonth:
+          type: integer
+          description: Месяц истечения срока действия карты (1-12)
+          format: int32
+          example: 12
+        expiryYear:
+          type: integer
+          description: Год истечения срока действия карты
+          format: int32
+          example: 2030
+        status:
+          type: string
+          description: Статус карты
+          example: ACTIVE
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+        balance:
+          type: number
+          description: Текущий баланс
+          example: 15420.5
+      description: Информация о банковской карте пользователя
+    PageCardResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardResponse"
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+      BalanceResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID карты
+          format: int64
+          example: 42
+        balance:
+          type: number
+          description: Баланс карты
+          example: 15420.5
+      description: Баланс карты
+    MeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID пользователя
+          format: int64
+          example: 1
+        username:
+          type: string
+          description: Имя пользователя
+          example: admin
+        role:
+          type: string
+          description: Роль пользователя
+          example: ADMIN
+      description: Информация о текущем пользователе
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
