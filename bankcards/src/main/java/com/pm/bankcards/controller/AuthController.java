@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth", description = "аутентификация")
+@Tag(name = "Auth", description = "Аутентификация")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
