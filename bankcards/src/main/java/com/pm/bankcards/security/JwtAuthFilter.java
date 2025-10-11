@@ -43,6 +43,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        System.out.println(req.getMethod()+" "+req.getRequestURI()+" | Auth="+req.getHeader("Authorization"));
+
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ") &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -62,6 +64,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
+
+
 
         chain.doFilter(req, res);
     }

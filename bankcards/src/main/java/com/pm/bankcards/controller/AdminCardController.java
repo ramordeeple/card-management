@@ -2,15 +2,20 @@ package com.pm.bankcards.controller;
 
 import com.pm.bankcards.dto.card.CardCreateRequest;
 import com.pm.bankcards.dto.card.CardResponse;
+import com.pm.bankcards.dto.card.TopUpRequest;
 import com.pm.bankcards.entity.User;
+import com.pm.bankcards.repository.TransferRepository;
 import com.pm.bankcards.repository.UserRepository;
 import com.pm.bankcards.service.api.CardAdminService;
+import com.pm.bankcards.service.api.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 
 @Tag(name = "Admin cards", description = "Администрирование карт")

@@ -20,6 +20,7 @@ public enum ErrorCodes {
     SAME_CARD,
     AMOUNT_INVALID,
     INSUFFICIENT_FUNDS,
+    DUPLICATE_REQUEST,
 
     /// Other
     UNKNOWN_ERROR

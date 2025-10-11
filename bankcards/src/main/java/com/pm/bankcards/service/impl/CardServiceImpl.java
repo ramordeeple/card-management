@@ -12,6 +12,8 @@ import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.spec.CardSpecifications;
 import com.pm.bankcards.service.api.CardAdminService;
 import com.pm.bankcards.service.api.CardQueryService;
+import com.pm.bankcards.service.crypto.AesGcmEncryptionService;
+import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.util.Specs;
 import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.mapper.CardMapper;
@@ -30,10 +32,12 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
 
     private final CardRepository cards;
     private final CardMapper mapper;
+    private final EncryptionService encryption;
 
-    public CardServiceImpl(CardRepository cards, CardMapper mapper) {
+    public CardServiceImpl(CardRepository cards, CardMapper mapper, EncryptionService encryption) {
         this.cards = cards;
         this.mapper = mapper;
+        this.encryption = encryption;
     }
 
     @Transactional
@@ -77,12 +81,14 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
     @Override
     public CardResponse create(CardCreateRequest req, User owner) {
         Card card = new Card();
+        String pan = req.number().replaceAll("\\s+", "");
         card.setOwner(owner);
         card.setExpiryMonth(req.expiryMonth());
         card.setExpiryYear(req.expiryYear());
         card.setLast4(req.number().substring(req.number().length() - 4));
-        cards.save(card);
+        card.setCardNumberEnc(encryption.encrypt(pan));
 
+        cards.save(card);
         return mapper.toDto(card);
     }
 

@@ -13,7 +13,7 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Convert(converter = CryptoStringConverter.class)
+//    @Convert(converter = CryptoStringConverter.class)
     @Column(name = "card_number_enc", nullable = false, unique = true, length = 256)
     private String cardNumberEnc;
 

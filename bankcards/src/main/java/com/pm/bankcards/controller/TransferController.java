@@ -1,5 +1,6 @@
 package com.pm.bankcards.controller;
 
+import com.pm.bankcards.dto.card.TopUpRequest;
 import com.pm.bankcards.dto.transfer.TransferRequest;
 import com.pm.bankcards.dto.transfer.TransferResponse;
 import com.pm.bankcards.entity.Transfer;
@@ -26,6 +27,15 @@ public class TransferController {
 
     public TransferController(TransferService transfers) {
         this.transfers = transfers;
+    }
+
+    @Operation(summary = "Пополнение своей карты")
+    @PostMapping("/top-up")
+    public void topUp(
+            @AuthenticationPrincipal AuthUser me,
+            @Valid @RequestBody TopUpRequest req
+    ) {
+        transfers.topUp(req.cardId(), me.getId(), req.amount(), req.requestId());
     }
 
     @Operation(summary = "Перевод между своими картами (идемпотентный по requestId")

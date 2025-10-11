@@ -5,6 +5,7 @@ import com.pm.bankcards.dto.transfer.TransferRequest;
 import com.pm.bankcards.entity.Transfer;
 import com.pm.bankcards.exception.BusinessException;
 import com.pm.bankcards.exception.ErrorCodes;
+import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.TransferRepository;
 import com.pm.bankcards.service.api.TransferService;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,32 @@ public class TransferServiceImpl implements TransferService {
         this.transfers = transfers;
         this.cards = cards;
         this.rules = rules;
+    }
+
+    @Override
+    public void topUp(Long cardId, Long userId, BigDecimal amount, String requestId) {
+        if (transfers.existsByRequestId(requestId))
+            throw new BusinessException(ErrorCodes.DUPLICATE_REQUEST, "Дублированный ID запроса");
+
+        Card card = cards.findById(cardId)
+                .orElseThrow(() -> new NotFoundException("Card not found"));
+
+        if (!card.getOwner().getId().equals(userId))
+            throw new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card not owned by user");
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException(ErrorCodes.AMOUNT_INVALID, "Сумма перевода не может быть меньше или равно 0");
+
+        card.setBalance(card.getBalance().add(amount));
+
+        Transfer t = new Transfer();
+        t.setFromCard(null);
+        t.setToCard(card);
+        t.setAmount(amount);
+        t.setRequestId(requestId);
+        t.setCreatedAt(Instant.now());
+
+        transfers.save(t);
     }
 
     @Override

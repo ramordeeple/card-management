@@ -25,7 +25,7 @@ public class JwtTokenService {
         this.expirationMs = expirationMs;
     }
 
-    public String generate(String username, List<String> roles) {
+    public String generate(String username, List<RoleName> roles) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
 
