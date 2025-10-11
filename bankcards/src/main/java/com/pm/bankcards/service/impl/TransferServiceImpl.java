@@ -40,10 +40,14 @@ public class TransferServiceImpl implements TransferService {
             return transfers.findByRequestId(req.requestId()).orElseThrow();
 
         Card from = cards.lockByIdAndOwnerId(req.fromCardId(), currentUserId)
-                .orElseThrow(() -> new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта отправителя не найдена", Map.of("side", "FROM")));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта отправителя не найдена",
+                        Map.of("side", "FROM")));
 
         Card to = cards.lockByIdAndOwnerId(req.toCardId(), currentUserId)
-                .orElseThrow(() -> new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта получателя не найдена", Map.of("side", "TO")));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта получателя не найдена",
+                        Map.of("side", "TO")));
 
         TransferContext ctx = new TransferContext(from, to, req.amount(), req.requestId());
 
