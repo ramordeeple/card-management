@@ -7,7 +7,6 @@ import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.entity.CardStatus;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
-import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.mapper.CardMapper;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.service.impl.CardServiceImpl;
