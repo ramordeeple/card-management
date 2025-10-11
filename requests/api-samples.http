@@ -8,8 +8,8 @@
 @userUser = user
 @userPass = user123
 // При аутентификации будут выдаваться JWT токены, подставив их будет удобно применять запросы
-@adminToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc2MDIxNTQzOSwiZXhwIjoxNzYwMzAxODM5fQ.XC-uKSxexOFER4PwPs5SP8aZm85WeL259OsGyEqzjA8
-@userToken = <USER_TOKEN>
+@adminToken = <ADMIN_JWT>
+@userToken = <USER_JWT>
 
 GET {{baseUrl}}/swagger-ui/index.html
 ###
