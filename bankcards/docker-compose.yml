@@ -1,12 +1,13 @@
 services:
   db:
     image: postgres:latest
+    command: ["postgres", "-c", "port=5433"]
     environment:
       POSTGRES_DB: bankcards
       POSTGRES_USER: bank
       POSTGRES_PASSWORD: bank
     ports:
-      - "5433:5432"
+      - "5433:5433"
     volumes:
       - bankcards_pg:/var/lib/postgresql/data
 volumes:
