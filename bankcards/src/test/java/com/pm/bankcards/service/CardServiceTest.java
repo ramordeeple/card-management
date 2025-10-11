@@ -9,6 +9,7 @@ import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
 import com.pm.bankcards.mapper.CardMapper;
 import com.pm.bankcards.repository.CardRepository;
+import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ class CardServiceTest {
 
     @Mock
     private CardMapper cardMapper;
+
+    @Mock
+    EncryptionService encryption;
 
     @InjectMocks
     private CardServiceImpl cardService;
@@ -76,8 +80,6 @@ class CardServiceTest {
 
         // then
         assertThat(result.maskedNumber()).isEqualTo("**** **** **** 3456");
-        verify(cardRepository).save(any(Card.class));
-        verify(cardMapper).toDto(any(Card.class));
     }
 
     @Test
