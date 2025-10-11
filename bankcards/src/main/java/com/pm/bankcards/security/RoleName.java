@@ -8,4 +8,6 @@ public enum RoleName {
     ADMIN,
     @Schema(description = "Обычный пользователь")
     USER
+
+
 }

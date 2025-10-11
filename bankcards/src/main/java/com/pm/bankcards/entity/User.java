@@ -1,5 +1,6 @@
 package com.pm.bankcards.entity;
 
+import com.pm.bankcards.security.RoleName;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -59,7 +60,10 @@ public class User {
     }
 
     public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+        this.roles.clear();
+        if (roles != null) {
+            this.roles.addAll(roles);
+        }
     }
 
     public boolean isEnabled() { return enabled; }
