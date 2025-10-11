@@ -1,0 +1,25 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  liquibase:
+    change-log: classpath:db/migration/changelog-master.yaml
+
+security:
+  jwt:
+    secret: ${SECURITY_JWT_SECRET}
+  enc:
+    key: ${SECURITY_ENC_KEY}
+
+logging:
+  level:
+    org.springframework.web: WARN
