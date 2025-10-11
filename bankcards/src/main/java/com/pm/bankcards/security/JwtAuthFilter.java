@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,24 +28,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws ServletException, IOException
-    {
-        String header = req.getHeader("Authorization");
+            throws ServletException, IOException {
 
-        if (header != null && header.startsWith("Bearer ")) {
+        String path = req.getRequestURI();
+
+        boolean isPublic =
+                path.equals("/api/v1/auth/login") ||
+                        path.equals("/api/v1/auth/register") ||
+                        path.startsWith("/swagger-ui") ||
+                        path.startsWith("/v3/api-docs");
+
+        if (isPublic) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        String header = req.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ") &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+
             String token = header.substring(7);
             try {
                 String username = jwt.getUsername(token);
-                UserDetails user = users.loadUserByUsername(username);
+                jwt.validate(token);
 
-                var auth = new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        user.getAuthorities());
+                UserDetails user = users.loadUserByUsername(username);
+                var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
             } catch (JwtException e) {
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
                 return;
             }
         }
@@ -52,3 +66,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(req, res);
     }
 }
+

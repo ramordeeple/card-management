@@ -57,4 +57,8 @@ public class JwtTokenService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    public void validate(String token) {
+        parseClaims(token);
+    }
 }
