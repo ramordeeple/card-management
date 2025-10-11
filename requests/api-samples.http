@@ -1,0 +1,120 @@
+### ─────────────────────────────
+### GLOBAL VARS (редактируйте при необходимости)
+### ─────────────────────────────
+@baseUrl = http://localhost:8080
+// По умолчанию выдаются такие логин и пароли (менять в bootstrap/AdminBootstrap)
+@adminUser = admin
+@adminPass = admin123
+@userUser = user
+@userPass = user123
+// При аутентификации будут выдаваться JWT токены, подставив их будет удобно применять запросы
+@adminToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc2MDIxNTQzOSwiZXhwIjoxNzYwMzAxODM5fQ.XC-uKSxexOFER4PwPs5SP8aZm85WeL259OsGyEqzjA8
+@userToken = <USER_TOKEN>
+
+GET {{baseUrl}}/swagger-ui/index.html
+###
+GET {{baseUrl}}/v3/api-docs
+
+### 1. AUTH: логин админом
+# Сохраняем JWT в переменную {{token}}
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{adminUser}}",
+  "password": "{{adminPass}}"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+
+### 2. AUTH: логин под обычного пользователя
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{userUser}}",
+  "password": "{{userPass}}"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+### 3. AUTH: текущий пользователь
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{userToken}} // сюда подставить JWT токен
+Accept: application/json
+
+
+### 4. ADMIN: создать карту пользователю
+# Требуется роль ADMIN
+POST {{baseUrl}}/api/v1/admin/cards
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "number": "4211161311114242",
+  "expiryMonth": 6,
+  "expiryYear": 2032,
+  "ownerId": 1
+}
+
+### 5. ADMIN: активировать карту
+# Подставьте реальный ID созданной карты вместо 1
+POST {{baseUrl}}/api/v1/admin/cards/1/activate
+Authorization: Bearer {{adminToken}}
+
+
+### 6. ADMIN: заблокировать карту
+POST {{baseUrl}}/api/v1/admin/cards/1/block
+Authorization: Bearer {{adminToken}}
+
+
+### 7. ADMIN: удалить карту
+DELETE {{baseUrl}}/api/v1/admin/cards/1
+Authorization: Bearer {{adminToken}}
+
+
+### 8. USER: список карт (фильтры + пагинация)
+# Доступен только авторизованному пользователю
+GET {{baseUrl}}/api/v1/cards
+Authorization: Bearer {{userToken}}
+Accept: application/json
+
+
+### 9. USER: баланс конкретной карты
+GET {{baseUrl}}/api/v1/cards/1/balance
+Authorization: Bearer {{userToken}}
+Accept: application/json
+
+
+### 10. USER: запросить блокировку своей карты
+POST {{baseUrl}}/api/v1/cards/1/block
+Authorization: Bearer {{userToken}}
+
+
+### 11. Пополнение карты
+POST {{baseUrl}}/transfers/top-up
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "cardId": 3,
+  "amount": 250.00,
+  "requestId": "rid-123456789"
+}
+
+
+### 12. USER: перевод между своими картами
+POST {{baseUrl}}/transfers/own
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "fromCardId": 3,
+  "toCardId": 5,
+  "amount": 30.00,
+  "requestId": "{{lastTransferRequestId}}"
+}
