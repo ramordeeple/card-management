@@ -1,16 +1,17 @@
 package com.pm.bankcards.util;
 
+import com.pm.bankcards.service.crypto.AesGcmEncryptionService;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 
 @Converter(autoApply = false)
 public class CryptoStringConverter implements AttributeConverter<String, String> {
-    private static CryptoService staticCryptoService;
+    private static AesGcmEncryptionService staticCryptoService;
 
     /// Lazy access to bean
-    private CryptoService crypto() {
-        return SpringBeans.getBean(CryptoService.class);
+    private AesGcmEncryptionService crypto() {
+        return SpringBeans.getBean(AesGcmEncryptionService.class);
     }
 
     @Override
