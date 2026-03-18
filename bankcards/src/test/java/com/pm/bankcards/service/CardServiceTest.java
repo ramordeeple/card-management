@@ -9,7 +9,6 @@ import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
 import com.pm.bankcards.mapper.CardMapper;
 import com.pm.bankcards.repository.CardRepository;
-import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,9 +38,6 @@ class CardServiceTest {
 
     @Mock
     private CardMapper cardMapper;
-
-    @Mock
-    EncryptionService encryption;
 
     @InjectMocks
     private CardServiceImpl cardService;
@@ -83,7 +79,7 @@ class CardServiceTest {
     }
 
     @Test
-    void findMyCards_withFilterAndPagination() {
+    void findMyCardsWithFilterAndPagination() {
         PageRequest pageRequest = PageRequest.of(0, 10);
         CardFilter filter = new CardFilter("3456", CardStatus.ACTIVE, 2028);
         Page<Card> page = new PageImpl<>(Collections.singletonList(card));
@@ -99,7 +95,7 @@ class CardServiceTest {
     }
 
     @Test
-    void getBalance_success() {
+    void getBalanceSuccess() {
         when(cardRepository.findByIdAndOwnerId(1L, user.getId())).thenReturn(Optional.of(card));
 
         BigDecimal balance = cardService.getBalance(1L, user.getId());
