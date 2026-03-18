@@ -78,4 +78,9 @@ public class CardController {
         cards.requestBlock(id, currentUserId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/thread-test")
+    public String getThreadInfo() {
+        return Thread.currentThread().toString();
+    }
 }
