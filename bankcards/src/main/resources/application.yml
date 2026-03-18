@@ -1,11 +1,27 @@
 spring:
   config:
     import: optional:file:.env[.properties]
+  threads:
+    virtual:
+      enabled: true
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/bankcards}
+    username: ${DB_USERNAME:bank}
+    password: ${DB_PASSWORD:bank}
+    hikari:
+      maximum-pool-size: 12
+      minimum-idle: 5
+
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT:6379}
+      connect-timeout: 1s
+      timeout: 500ms
+
+    cache:
+      type: redis
 
   jpa:
     hibernate:
@@ -13,13 +29,18 @@ spring:
 
   liquibase:
     change-log: classpath:db/migration/changelog-master.yaml
+    enabled: true
 
 security:
   jwt:
-    secret: ${SECURITY_JWT_SECRET}
+    secret: ${SECURITY_JWT_SECRET:VGhpcy1pcy1hLXNlY3JldC1qd3QtYmFzZTY0LWtleS0xMjM0NTY3ODkwMTIzNA==}
+    expiration-ms: ${SECURITY_JWT_EXPIRATION:86400000}
   enc:
-    key: ${SECURITY_ENC_KEY}
+    key: ${SECURITY_ENC_KEY:w3m7b3k5yqZN7i0Hq7n9pK6vX3iF2l7r5p8q2v6t0mQ=}
 
 logging:
   level:
     org.springframework.web: WARN
+
+
+
