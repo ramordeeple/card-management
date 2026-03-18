@@ -5,6 +5,8 @@ import com.pm.bankcards.entity.User;
 import com.pm.bankcards.repository.UserRepository;
 import com.pm.bankcards.repository.RoleRepository;
 import com.pm.bankcards.security.RoleName;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,8 +15,8 @@ import java.util.Set;
 
 
 @Component
+@Slf4j
 public class AdminBootstrap implements CommandLineRunner {
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
@@ -46,7 +48,9 @@ public class AdminBootstrap implements CommandLineRunner {
             admin.setEnabled(true);
             admin.setRoles(Set.of(adminRole));
             userRepository.save(admin);
-            System.out.println("Создан админ: admin/admin123");
+
+            log.info("Админ ({} | {}) успешно создан", adminName, rawPassword);
+
             return admin;
         });
 
@@ -60,7 +64,9 @@ public class AdminBootstrap implements CommandLineRunner {
             normal.setEnabled(true);
             normal.setRoles(Set.of(userRole));
             userRepository.save(normal);
-            System.out.println("Создан пользователь: user/user123");
+
+            log.info("Обычный пользователь для тестов ({} | {}) успешно создан", userName, rawPassword);
+
             return normal;
         });
     }
