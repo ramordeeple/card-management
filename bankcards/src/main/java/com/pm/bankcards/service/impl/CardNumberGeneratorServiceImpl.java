@@ -1,7 +1,9 @@
 package com.pm.bankcards.service.impl;
 
 import com.pm.bankcards.service.api.CardNumberProvider;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CardNumberGeneratorServiceImpl implements CardNumberProvider {
     @Override
     public String generate(String bin, int index) {
