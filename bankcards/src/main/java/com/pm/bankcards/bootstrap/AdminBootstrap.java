@@ -37,9 +37,12 @@ public class AdminBootstrap implements CommandLineRunner {
 
 
         userRepository.findByUsername("admin").orElseGet(() -> {
+            String adminName = "admin";
+            String rawPassword = "admin";
+
             User admin = new User();
-            admin.setUsername("admin");
-            admin.setPasswordHash(encoder.encode("admin123"));
+            admin.setUsername(adminName);
+            admin.setPasswordHash(encoder.encode(rawPassword));
             admin.setEnabled(true);
             admin.setRoles(Set.of(adminRole));
             userRepository.save(admin);
@@ -48,9 +51,12 @@ public class AdminBootstrap implements CommandLineRunner {
         });
 
         userRepository.findByUsername("user").orElseGet(() -> {
+            String userName = "user";
+            String rawPassword = "user123";
+
             User normal = new User();
-            normal.setUsername("user");
-            normal.setPasswordHash(encoder.encode("user123"));
+            normal.setUsername(userName);
+            normal.setPasswordHash(encoder.encode(rawPassword));
             normal.setEnabled(true);
             normal.setRoles(Set.of(userRole));
             userRepository.save(normal);
