@@ -19,7 +19,7 @@ public class JwtTokenService {
 
     public JwtTokenService(
             @Value("${security.jwt.secret}") String secretBase64,
-            @Value("${security.jwt.expiration-ms:86400000}") long expirationMs
+            @Value("${security.jwt.expiration-ms}") long expirationMs
     ) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
         this.expirationMs = expirationMs;
@@ -40,14 +40,6 @@ public class JwtTokenService {
 
     public String getUsername(String token) {
         return parseClaims(token).getSubject();
-    }
-
-    public List<String> getRoles(String token) {
-        Object raw = parseClaims(token).get("roles");
-        if (raw instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        return List.of();
     }
 
     private Claims parseClaims(String token) {
