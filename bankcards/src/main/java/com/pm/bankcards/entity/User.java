@@ -1,6 +1,5 @@
 package com.pm.bankcards.entity;
 
-import com.pm.bankcards.security.RoleName;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
