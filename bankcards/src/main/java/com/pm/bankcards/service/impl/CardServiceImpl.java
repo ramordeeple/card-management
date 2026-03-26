@@ -12,11 +12,12 @@ import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.spec.CardSpecifications;
 import com.pm.bankcards.service.api.CardAdminService;
 import com.pm.bankcards.service.api.CardQueryService;
-import com.pm.bankcards.service.crypto.AesGcmEncryptionService;
 import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.util.Specs;
 import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.mapper.CardMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -76,6 +77,14 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         card.block();
     }
 
+    @Override
+    @Cacheable(value = "cards", key = "#cardId")
+    public CardResponse getCardDetails(Long cardId) {
+        return cards.findById(cardId)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Card not found"));
+    }
+
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     @Override
@@ -92,6 +101,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         return mapper.toDto(card);
     }
 
+    @CacheEvict(value = "cards", key = "#cardId")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     @Override

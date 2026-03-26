@@ -11,4 +11,5 @@ public interface CardQueryService {
     Page<CardResponse> findMyCards(Long currentUserId, Pageable pageable, CardFilter filter);
     BigDecimal getBalance(Long cardId, Long currentUserId);
     void requestBlock(Long cardId, Long currentUserId);
+    CardResponse getCardDetails(Long cardId);
 }
