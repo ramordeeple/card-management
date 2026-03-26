@@ -10,7 +10,7 @@ spring:
     username: ${DB_USERNAME:bank}
     password: ${DB_PASSWORD:bank}
     hikari:
-      maximum-pool-size: 12
+      maximum-pool-size: 50
       minimum-idle: 5
 
   data:
@@ -42,5 +42,11 @@ logging:
   level:
     org.springframework.web: WARN
 
-
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, metrics
+  metrics:
+    tags:
+      application: bank-cards-service
