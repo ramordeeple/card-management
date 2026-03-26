@@ -118,3 +118,7 @@ Accept: application/json
   "amount": 30.00,
   "requestId": "{{lastTransferRequestId}}"
 }
+
+
+### Check thread info
+GET {{baseUrl}}/api/v1/cards/thread-test
