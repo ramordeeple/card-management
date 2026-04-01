@@ -123,8 +123,9 @@ Accept: application/json
 ### Check thread info
 GET {{baseUrl}}/api/v1/cards/thread-test
 
+### Get card details (need for caching in redis)
+GET http://localhost:8080/api/v1/cards/1
+
 ### Loadcheck (check redis caching in Hikari connections)
 POST http://localhost:8080/api/v1/cards/load-test/1
 
-### Get card details
-GET http://localhost:8080/api/v1/cards/1
