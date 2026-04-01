@@ -20,8 +20,8 @@ spring:
       connect-timeout: 1s
       timeout: 500ms
 
-    cache:
-      type: redis
+  cache:
+    type: redis
 
   jpa:
     hibernate:
@@ -50,3 +50,13 @@ management:
   metrics:
     tags:
       application: bank-cards-service
+
+  endpoint:
+    metrics:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
