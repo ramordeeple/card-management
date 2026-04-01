@@ -4,4 +4,5 @@ import com.pm.bankcards.entity.User;
 
 public interface DatabaseSeeder {
     void seedCards(User owner, int count);
+    void startLoadTest(Long cardId);
 }
