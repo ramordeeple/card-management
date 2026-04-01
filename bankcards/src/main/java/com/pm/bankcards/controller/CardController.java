@@ -32,7 +32,6 @@ public class CardController {
         this.databaseSeeder = databaseSeeder;
     }
 
-
     @Operation(summary = "Список карт (фильтры + пагинация)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -93,5 +92,10 @@ public class CardController {
     public void runLoadTest(@PathVariable Long cardId) {
         databaseSeeder.startLoadTest(cardId);
         log.info("Load test started for {} card", cardId);
+    }
+
+    @GetMapping("/{cardId}")
+    public CardResponse getCardDetails(@PathVariable Long cardId) {
+        return cardQueryService.getCardDetails(cardId);
     }
 }
