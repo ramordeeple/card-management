@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth", description = "Аутентификация")
+@Tag(name = "Auth")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -23,13 +23,13 @@ public class AuthController {
         this.auth = auth;
     }
 
-    @Operation(summary = "Вход в систему (без авторизации)")
+    @Operation(summary = "Log in (no authorization)")
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest req) {
         return auth.login(req);
     }
 
-    @Operation(summary = "Проверка токена (требует авторизации)")
+    @Operation(summary = "Check token (requires authorization)")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
     public MeResponse me(@AuthenticationPrincipal AuthUser me) {

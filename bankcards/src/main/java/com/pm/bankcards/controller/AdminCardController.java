@@ -15,10 +15,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 
-
-@Tag(name = "Admin cards", description = "Администрирование карт")
+@Tag(name = "Admin cards")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/admin/cards")
@@ -33,28 +31,28 @@ public class AdminCardController {
         this.users = users;
     }
 
-    @Operation(summary = "Создать карту пользователя")
+    @Operation(summary = "Create a card for user")
     @PostMapping
     public CardResponse create(@Valid @RequestBody CardCreateRequest req) {
         User owner = users.findById(req.ownerId())
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         return cards.create(req, owner);
     }
 
-    @Operation(summary = "Активировать карту (админ)")
+    @Operation(summary = "Activate card (card)")
     @PostMapping("/{id}/activate")
     public void activate(@PathVariable Long id) {
         cards.activate(id);
     }
 
-    @Operation(summary = "Заблокировать карту (админ)")
+    @Operation(summary = "Block card (admin)")
     @PostMapping("/{id}/block")
     public void block(@PathVariable Long id) {
         cards.block(id);
     }
 
-    @Operation(summary = "Удалить карту (админ)")
+    @Operation(summary = "Delete card (admin)")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         cards.delete(id);

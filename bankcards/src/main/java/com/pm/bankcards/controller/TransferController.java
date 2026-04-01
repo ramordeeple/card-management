@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 
-@Tag(name = "Transfers", description = "Переводы между своими картами")
+@Tag(name = "Transfers", description = "Transfers between own cards")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/transfers")
@@ -29,7 +29,7 @@ public class TransferController {
         this.transfers = transfers;
     }
 
-    @Operation(summary = "Пополнение своей карты")
+    @Operation(summary = "Top up own card")
     @PostMapping("/top-up")
     public void topUp(
             @AuthenticationPrincipal AuthUser me,
@@ -38,7 +38,7 @@ public class TransferController {
         transfers.topUp(req.cardId(), me.getId(), req.amount(), req.requestId());
     }
 
-    @Operation(summary = "Перевод между своими картами (идемпотентный по requestId")
+    @Operation(summary = "Transfer between own cards (Idempotent to requestId")
     @PostMapping("/own")
     public TransferResponse ownTransfer(
             @AuthenticationPrincipal AuthUser me,

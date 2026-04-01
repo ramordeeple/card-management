@@ -57,7 +57,7 @@ public class AdminBootstrap implements CommandLineRunner {
             admin.setRoles(Set.of(adminRole));
             userRepository.save(admin);
 
-            log.info("Админ ({} | {}) успешно создан", adminName, adminPassword);
+            log.info("Admin ({} | {}) was successfully created", adminName, adminPassword);
 
             return admin;
         });
@@ -70,7 +70,7 @@ public class AdminBootstrap implements CommandLineRunner {
             normal.setRoles(Set.of(userRole));
             userRepository.save(normal);
 
-            log.info("Обычный пользователь для тестов ({} | {}) успешно создан", userName, rawPassword);
+            log.info("A user for tests ({} | {}) was successfully created", userName, rawPassword);
 
             return normal;
         });

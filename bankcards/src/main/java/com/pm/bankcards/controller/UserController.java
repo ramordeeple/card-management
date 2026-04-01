@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Admin Users", description = "Управление пользователями (админ)")
+@Tag(name = "Admin Users", description = "User management (admin)")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/admin/users")
@@ -27,7 +27,7 @@ public class UserController {
         this.users = users;
     }
 
-    @Operation(summary = "Создать пользователя")
+    @Operation(summary = "Create user")
     @PostMapping
     public UserResponse create(@Valid @RequestBody UserCreateRequest req) {
         return users.create(req);
