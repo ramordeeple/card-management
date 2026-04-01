@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
@@ -71,5 +69,23 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
 
         long duration = System.currentTimeMillis() - start;
         log.info("warmth-up has completed in {} milliseconds", duration);
+    }
+
+    public void startLoadTest(Long cardId) {
+        final int requestCount = 100000;
+
+        Thread.startVirtualThread(() -> {
+            log.info("Starting load test for card {}", cardId);
+
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                for (int i = 0; i < requestCount; i++) {
+                    executor.submit(() -> {
+                        cardQueryService.getCardDetails(cardId);
+                    });
+                }
+            }
+        });
+
+        log.info("Load test executed for card for {} requests", requestCount);
     }
 }
