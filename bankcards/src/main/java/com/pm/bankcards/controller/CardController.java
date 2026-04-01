@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,7 @@ public class CardController {
     }
 
     @Operation(summary = "Card balance")
+    @ApiResponse(responseCode = "404", description = "Card not found")
     @GetMapping("/{id}/balance")
     public BalanceResponse balance(
             @Parameter(hidden = true)
@@ -74,12 +76,14 @@ public class CardController {
     }
 
     @PostMapping("/load-test/{cardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void runLoadTest(@PathVariable Long cardId) {
         databaseSeeder.startLoadTest(cardId);
         log.info("Load test started for {} card", cardId);
     }
 
     @GetMapping("/{cardId}")
+    @ApiResponse(responseCode = "404", description = "Card not found")
     public CardResponse getCardDetails(@PathVariable Long cardId) {
         return cardQueryService.getCardDetails(cardId);
     }
