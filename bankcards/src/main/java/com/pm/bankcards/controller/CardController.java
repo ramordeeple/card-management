@@ -1,6 +1,7 @@
 package com.pm.bankcards.controller;
 
 import com.pm.bankcards.dto.card.*;
+import com.pm.bankcards.service.api.ApiStandardResponses;
 import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.service.api.DatabaseSeeder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+@ApiStandardResponses
 @Slf4j
-@Tag(name = "Cards", description = "Операции с собственными картами")
+@Tag(name = "Cards", description = "Operations with own cards")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping(value = "/api/v1/cards", produces = "application/json")
@@ -32,12 +34,7 @@ public class CardController {
         this.databaseSeeder = databaseSeeder;
     }
 
-    @Operation(summary = "Список карт (фильтры + пагинация)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "401", description = "Неавторизован"),
-            @ApiResponse(responseCode = "403", description = "Нет прав")
-    })
+    @Operation(summary = "Card list (filters + pagination)")
     @GetMapping
     public Page<CardResponse> findMyCards(
             @Parameter(hidden = true)
@@ -48,13 +45,7 @@ public class CardController {
         return cardQueryService.findMyCards(currentUserId, pageable, filter);
     }
 
-    @Operation(summary = "Баланс карты")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "401", description = "Неавторизован"),
-            @ApiResponse(responseCode = "403", description = "Нет прав"),
-            @ApiResponse(responseCode = "404", description = "Карта не найдена")
-    })
+    @Operation(summary = "Card balance")
     @GetMapping("/{id}/balance")
     public BalanceResponse balance(
             @Parameter(hidden = true)
@@ -66,13 +57,7 @@ public class CardController {
         return new BalanceResponse(id, value);
     }
 
-    @Operation(summary = "Запросить блокировку карты")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Запрос принят"),
-            @ApiResponse(responseCode = "401", description = "Неавторизован"),
-            @ApiResponse(responseCode = "403", description = "Нет прав"),
-            @ApiResponse(responseCode = "404", description = "Карта не найдена")
-    })
+    @Operation(summary = "Request to block card")
     @PostMapping("/{id}/block")
     public ResponseEntity<Void> requestBlock(
             @Parameter(hidden = true)
