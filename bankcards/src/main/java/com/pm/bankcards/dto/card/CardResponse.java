@@ -3,6 +3,7 @@ package com.pm.bankcards.dto.card;
 import com.pm.bankcards.entity.CardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Schema(description = "Информация о банковской карте пользователя")
@@ -21,4 +22,4 @@ public record CardResponse(
         CardStatus status,
         @Schema(example = "15420.50", description = "Текущий баланс")
         BigDecimal balance
-) {}
+) implements Serializable {}
