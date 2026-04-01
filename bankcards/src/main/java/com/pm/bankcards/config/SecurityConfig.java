@@ -47,7 +47,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/register",
                                 "/api/v1/cards/thread-test",
                                 "/actuator/**",
-                                "/api/v1/cards/load-test/**").permitAll()
+                                "/api/v1/cards/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
