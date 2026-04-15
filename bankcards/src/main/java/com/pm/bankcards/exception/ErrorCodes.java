@@ -10,6 +10,7 @@ public enum ErrorCodes {
     INVALID_CREDENTIALS,
     USER_DISABLED,
     USERNAME_TAKEN,
+    UNAUTHORIZED,
 
     /// Cards
     CARD_NOT_FOUND_OR_NOT_OWNED,
