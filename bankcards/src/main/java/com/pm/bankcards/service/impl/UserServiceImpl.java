@@ -11,6 +11,8 @@ import com.pm.bankcards.repository.RoleRepository;
 import com.pm.bankcards.repository.UserRepository;
 import com.pm.bankcards.security.RoleName;
 import com.pm.bankcards.service.api.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,6 @@ import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     private final UserRepository users;
     private final RoleRepository roles;
     private final PasswordEncoder encoder;
@@ -48,5 +49,29 @@ public class UserServiceImpl implements UserService {
         users.save(user);
 
         return new UserResponse(user.getId(), user.getUsername(), role.getName(), user.isEnabled());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getById(Long id) {
+        return users.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found: " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getName())) {
+            throw new BusinessException(ErrorCodes.UNAUTHORIZED, "This user is not authorized");
+        }
+
+        String username = authentication.getName();
+
+        return users.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("This user: " + username + " not found"));
     }
 }
