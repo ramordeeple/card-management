@@ -39,16 +39,19 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs.yaml"
+                                "/v3/api-docs.yaml",
+                                "/actuator/**"
                         ).permitAll()
 
                         .requestMatchers(
                                 "/api/v1/auth/login",
-                                "/api/v1/auth/register",
-                                "/api/v1/cards/thread-test",
-                                "/actuator/**",
-                                "/api/v1/cards/**").permitAll()
+                                "/api/v1/auth/register"
+                        ).permitAll()
+
+                        .requestMatchers("/api/v1/admin/debug/**").permitAll()
+
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
