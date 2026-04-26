@@ -12,9 +12,9 @@
 | Компонент       | Технологии                                                      |
 | --------------- | --------------------------------------------------------------- |
 | Backend         | Java 17+, Spring Boot 3, Spring Security (JWT), Spring Data JPA |
-| Database        | PostgreSQL, Liquibase                                           |
+| Database        | PostgreSQL, Liquibase, Redis                                    |
 | API Docs        | OpenAPI/Swagger (springdoc)                                     |
-| Dev Environment | Docker Compose                                                  |
+| Dev Environment | Docker Compose, Prometheus, Grafana                             |
 | Testing         | JUnit 5, Mockito, Testcontainers                                |
 | Build           | Maven 3.9+                                                      |
 
