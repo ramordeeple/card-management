@@ -3,13 +3,13 @@ version: '3.8'
 services:
   db:
     image: postgres:latest
-    command: ["postgres", "-c", "port=5432"] # Внутри контейнера лучше оставить 5432
+    command: ["postgres", "-c", "port=5432"]
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432" # Снаружи будет тот порт, что в .env
+      - "${DB_PORT}:5432"
     volumes:
       - bankcards_pg:/var/lib/postgresql
     healthcheck:
