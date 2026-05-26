@@ -4,14 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "Создание пользователя (админ)")
+@Schema(description = "Create user (admin)")
 public record UserCreateRequest(
-        @Schema(example = "Bob", description = "Имя пользователя")
-        @NotBlank(message = "Требуется имя")
+        @Schema(example = "Bob", description = "User name")
+        @NotBlank(message = "Name required")
         String username,
 
-        @Schema(example = "qwerty123", description = "Пароль")
+        @Schema(example = "qwerty123", description = "Password")
         @NotBlank
-        @Size(min = 8, message = "Пароль должен содержать хотя бы 8 символов")
+        @Size(min = 8, message = "Password should contain at least 8 characters")
         String password
 ) {}

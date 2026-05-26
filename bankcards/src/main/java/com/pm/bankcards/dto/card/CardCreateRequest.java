@@ -5,21 +5,21 @@ import jakarta.validation.constraints.*;
 
 public record CardCreateRequest(
         @Schema(example = "4111111111114242",
-        description = "Полный номер карты")
+        description = "Complete card number")
         @NotBlank
-        @Pattern(regexp = "\\d{16}", message = "Карта должна содержать 16 цифр")
+        @Pattern(regexp = "\\d{16}", message = "Card should contain 16 digis")
         String number,
 
-        @Schema(example = "12", description = "Месяц истечения срока карты(1-12)")
+        @Schema(example = "12", description = "Expiration month (1-12)")
         @Min(value = 1)
         @Max(value = 12)
         int expiryMonth,
 
-        @Schema(example = "2030", description = "Год истечения срока карты")
+        @Schema(example = "2030", description = "Expiration year")
         @Min(value = 2024)
         int expiryYear,
 
-        @Schema(example = "2", description = "ID владельца (пользователя)")
+        @Schema(example = "2", description = "ID owner (user)")
         @NotNull
         Long ownerId
 ) {}

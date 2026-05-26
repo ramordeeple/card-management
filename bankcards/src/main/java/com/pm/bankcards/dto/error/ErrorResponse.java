@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
 
-@Schema(description = "Стандартная ошибка API")
+@Schema(description = "Standard API error")
 public record ErrorResponse(
         @Schema(example = "2025-10-07T12:34:56Z")
         String timestamp,
@@ -12,6 +12,6 @@ public record ErrorResponse(
         @Schema(example = "INVALID_CREDENTIALS")
         String code,
 
-        @Schema(example = "Неверные учетные данные")
+        @Schema(example = "Wrong account data")
         String message, Map<String, Object> details
 ) { }

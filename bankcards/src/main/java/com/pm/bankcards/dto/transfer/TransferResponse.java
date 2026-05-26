@@ -8,14 +8,14 @@ import java.time.Instant;
 
 @Schema(description = "Результат перевода")
 public record TransferResponse(
-    @Schema(example = "777", description = "ID операции перевода")
+    @Schema(example = "777", description = "Transfer operation ID")
     Long id,
-    @Schema(example = "**** **** **** 1111", description = "Карта отправителя (маска)")
+    @Schema(example = "**** **** **** 1111", description = "Sender's card (masked)")
     String fromMasked,
-    @Schema(example = "**** **** **** 1111", description = "Карта получателя (маска)")
+    @Schema(example = "**** **** **** 1111", description = "Receiver's card (masked)")
     String toMasked,
-    @Schema(example = "100.00", description = "Сумма перевода")
+    @Schema(example = "100.00", description = "Transfer amount")
     BigDecimal amount,
-    @Schema(example = "2025-10-07T15:42:00Z", description = "Время выполнения перевода")
+    @Schema(example = "2025-10-07T15:42:00Z", description = "Transfer completion time")
     Instant createdAt
 ) {}
