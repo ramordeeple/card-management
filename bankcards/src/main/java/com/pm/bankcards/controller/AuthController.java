@@ -38,7 +38,8 @@ public class AuthController {
                 me.getUsername(),
                 me.getAuthorities().stream()
                         .findFirst()
-                        .map(a -> a.getAuthority().replace("ROLE_", ""))
+                        .map(a ->
+                                a.getAuthority().replace("ROLE_", ""))
                         .orElse("USER")
                 );
     }

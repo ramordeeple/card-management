@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 
 @ApiStandardResponses
 @Slf4j
@@ -81,6 +82,7 @@ public class CardController {
         databaseSeeder.startLoadTest(cardId);
         log.info("Load test started for {} card", cardId);
     }
+
 
     @GetMapping("/{cardId}")
     @ApiResponse(responseCode = "404", description = "Card not found")
