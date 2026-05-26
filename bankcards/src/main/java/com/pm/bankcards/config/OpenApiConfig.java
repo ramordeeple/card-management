@@ -21,10 +21,11 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Bankcards API")
                         .description("""
-                                Система управления картами: CRUD, переводы, фильтры/пагинация, JWT.
+                                Card management: CRUD, transfers, filters/pagination, JWT.
                                 """)
                         .version("v1")
-                        .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0"))
+                        .license(new License().name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0"))
                         .contact(new Contact().name("ramordeeple")))
                 .servers(List.of(
                         new Server().url("http://localhost:8080").description("Dev"),
