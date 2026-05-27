@@ -20,16 +20,16 @@ public class AdminBootstrap implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
 
-    @Value("${ADMIN_NAME}")
+    @Value("${admin.username}")
     String adminName;
 
-    @Value("${ADMIN_NAME}")
+    @Value("${admin.password}")
     String adminPassword;
 
-    @Value("${TEST_USERNAME}")
+    @Value("${test-user.username}")
     String userName;
 
-    @Value("${TEST_USER_PASSWORD}")
+    @Value("${test-user.password}")
     String rawPassword;
 
     public AdminBootstrap(UserRepository userRepository,
