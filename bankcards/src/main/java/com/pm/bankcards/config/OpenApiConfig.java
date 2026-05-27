@@ -21,7 +21,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Bankcards API")
                         .description("""
-                                Card management: CRUD, transfers, filters/pagination, JWT.
+                                Card management: CRUD, transfers, filters/pagination, JWT, I/O high load.
                                 """)
                         .version("v1")
                         .license(new License().name("Apache 2.0")
