@@ -1,9 +1,36 @@
 version: '3.8'
 
 services:
+  app:
+    build:
+      context: ./bankcards
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+
+      - ADMIN_NAME=${ADMIN_NAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SECURITY_JWT_SECRET=${SECURITY_JWT_SECRET}
+      - SECURITY_ENC_KEY=${SECURITY_ENC_KEY}
+      - SECURITY_JWT_EXPIRATION=${SECURITY_JWT_EXPIRATION}
+      - TEST_USERNAME=${TEST_USERNAME}
+      - TEST_USER_PASSWORD=${TEST_USER_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
   db:
     image: postgres:latest
     command: ["postgres", "-c", "port=5432"]
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
