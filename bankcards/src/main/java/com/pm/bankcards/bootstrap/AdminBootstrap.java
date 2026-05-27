@@ -49,7 +49,7 @@ public class AdminBootstrap implements CommandLineRunner {
                 .orElseGet(() -> roleRepository.save(Role.of(RoleName.USER)));
 
 
-        userRepository.findByUsername("admin").orElseGet(() -> {
+        userRepository.findByUsername(adminName).orElseGet(() -> {
             User admin = new User();
             admin.setUsername(adminName);
             admin.setPasswordHash(encoder.encode(adminPassword));
@@ -62,7 +62,7 @@ public class AdminBootstrap implements CommandLineRunner {
             return admin;
         });
 
-        userRepository.findByUsername("user").orElseGet(() -> {
+        userRepository.findByUsername(userName).orElseGet(() -> {
             User normal = new User();
             normal.setUsername(userName);
             normal.setPasswordHash(encoder.encode(rawPassword));
