@@ -3,7 +3,6 @@ package com.pm.bankcards.controller;
 import com.pm.bankcards.dto.user.UserCreateRequest;
 import com.pm.bankcards.dto.user.UserResponse;
 import com.pm.bankcards.service.api.UserService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
