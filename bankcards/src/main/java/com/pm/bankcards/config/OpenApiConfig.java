@@ -17,19 +17,23 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI bankcardsOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Bankcards API")
-                        .description("""
-                                Card management: CRUD, transfers, filters/pagination, JWT, I/O high load.
-                                """)
-                        .version("v1")
-                        .license(new License().name("Apache 2.0")
-                                .url("https://www.apache.org/licenses/LICENSE-2.0"))
-                        .contact(new Contact().name("ramordeeple")))
+        var appTitle = "Bankcards API";
+        var appVersion = "v1";
+
+        var appDescription = """
+                Card management: CRUD, transfers, filters/pagination, JWT, I/O high load.
+                """;
+
+        var devURL = "http://localhost:8080";
+        var productionURL = "https://bankcards.com";
+
+        return new OpenAPI().info(new Info()
+                        .title(appTitle)
+                        .description(appDescription)
+                        .version(appVersion))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Dev"),
-                        new Server().url("https://bankcards.com").description("Production")
+                        new Server().url(devURL).description("Dev"),
+                        new Server().url(productionURL).description("Production")
                 ))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
@@ -37,6 +41,6 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT"))
-                        );
+                );
     }
 }
