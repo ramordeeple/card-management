@@ -9,6 +9,7 @@ import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
 import com.pm.bankcards.mapper.CardMapper;
 import com.pm.bankcards.repository.CardRepository;
+import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,12 +40,17 @@ class CardServiceTest {
     @Mock
     private CardMapper cardMapper;
 
+    @Mock
+    private EncryptionService encryption;
+
     @InjectMocks
     private CardServiceImpl cardService;
 
     private User user;
     private Card card;
     private CardResponse cardResponse;
+
+
 
     @BeforeEach
     void setUp() {
@@ -60,14 +66,28 @@ class CardServiceTest {
         card.setStatus(CardStatus.ACTIVE);
         card.setBalance(BigDecimal.valueOf(1000));
 
-        cardResponse = new CardResponse(1L, "**** **** **** 3456",
-                user.getUsername(), 12, 2028, CardStatus.ACTIVE, BigDecimal.valueOf(1000));
+        cardResponse = new CardResponse(
+                1L,
+                "**** **** **** 3456",
+                user.getUsername(),
+                12,
+                2028,
+                CardStatus.ACTIVE,
+                BigDecimal.valueOf(1000));
     }
 
     @Test
     void createCardSuccess() {
         // given
-        CardCreateRequest request = new CardCreateRequest("1234567890123456", 12, 2028, user.getId());
+        CardCreateRequest request = new CardCreateRequest(
+                "1234567890123456",
+                12,
+                2028,
+                user.getId());
+
+
+        when(encryption.encrypt("1234567890123456"))
+                .thenReturn("encrypted-card-number");
         when(cardRepository.save(any(Card.class))).thenReturn(card);
         when(cardMapper.toDto(any(Card.class))).thenReturn(cardResponse);
 
