@@ -21,7 +21,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final JwtTokenService jwt;
 
-    public AuthServiceImpl(UserRepository users, PasswordEncoder encoder, JwtTokenService jwt) {
+    public AuthServiceImpl(
+            UserRepository users,
+            PasswordEncoder encoder,
+            JwtTokenService jwt) {
         this.users = users;
         this.encoder = encoder;
         this.jwt = jwt;
@@ -47,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getUsername(),
                 user.getRoles().stream().map(r -> r.getName()).toList()
         );
+
         return new TokenResponse(token);
     }
 }
