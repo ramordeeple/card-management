@@ -13,7 +13,6 @@ import com.pm.bankcards.repository.spec.CardSpecifications;
 import com.pm.bankcards.service.api.CardAdminService;
 import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.service.crypto.EncryptionService;
-import com.pm.bankcards.util.Specs;
 import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.mapper.CardMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -49,7 +48,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
                 !filter.last4().isBlank()) ? filter.last4() : null;
         var expiryYear = (filter != null) ? filter.expiryYear() : null;
 
-        Specification<Card> spec = Specs.compose(
+        Specification<Card> spec = Specification.allOf(
             CardSpecifications.ownerId(currentUserId),
             CardSpecifications.status(status),
             CardSpecifications.last4(last4),
