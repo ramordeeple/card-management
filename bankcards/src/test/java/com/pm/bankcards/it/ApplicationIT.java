@@ -1,5 +1,6 @@
 package com.pm.bankcards.it;
 
+import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -8,6 +9,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Description("For local java application (not in Docker)")
 @SpringBootTest
 @Testcontainers
 public class ApplicationIT {
