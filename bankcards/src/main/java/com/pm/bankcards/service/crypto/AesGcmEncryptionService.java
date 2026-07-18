@@ -25,7 +25,6 @@ public class AesGcmEncryptionService implements EncryptionService {
         this.keySpec = new SecretKeySpec(keyBytes, "AES");
     }
 
-
     @Override
     public String encrypt(String value) {
         try {
