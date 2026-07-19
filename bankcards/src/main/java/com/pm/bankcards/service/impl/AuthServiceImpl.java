@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
 
         var token = jwt.generate(
                 user.getUsername(),
-                user.getRoles().stream().map(r -> r.getName()).toList()
+                user.getRole()
         );
 
         return new TokenResponse(token);
