@@ -2,7 +2,7 @@ package com.pm.bankcards.service;
 
 import com.pm.bankcards.dto.transfer.TransferRequest;
 import com.pm.bankcards.entity.Card;
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.entity.Transfer;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
