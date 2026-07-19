@@ -3,7 +3,7 @@ package com.pm.bankcards.exception;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Коды бизнес-ошибок")
+@Schema(description = "Business error codes")
 public enum ErrorCodes {
 
     /// Auth
