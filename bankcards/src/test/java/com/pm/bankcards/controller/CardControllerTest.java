@@ -3,9 +3,10 @@ package com.pm.bankcards.controller;
 import com.pm.bankcards.security.CustomUserDetailsService;
 import com.pm.bankcards.security.JwtAuthFilter;
 import com.pm.bankcards.security.JwtTokenService;
+import com.pm.bankcards.security.RoleName;
 import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.dto.card.CardResponse;
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.service.api.DatabaseSeeder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CardController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@WithMockUser(username = "user", roles = "USER")
 class CardControllerTest {
 
     @Autowired
@@ -63,7 +66,8 @@ class CardControllerTest {
 
         var page = new PageImpl<>(List.of(card));
 
-        when(cardQueryService.findMyCards(any(), any(), any())).thenReturn(page);
+        when(cardQueryService.findMyCards(any(), any(), any()))
+                .thenReturn(page);
 
         // Create principal with id
         var principal = new UsernamePasswordAuthenticationToken(
@@ -71,7 +75,7 @@ class CardControllerTest {
                     public Long id = 1L;
                 },
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                List.of(new SimpleGrantedAuthority("USER"))
         );
 
         mvc.perform(get("/api/v1/cards")
