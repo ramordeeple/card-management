@@ -25,13 +25,13 @@ public class JwtTokenService {
         this.expirationMs = expirationMs;
     }
 
-    public String generate(String username, List<RoleName> roles) {
+    public String generate(String username, RoleName role) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(username)
-                .claim("roles", roles)
+                .claim("role", List.of(role.name()))
                 .issuedAt(now)
                 .expiration(exp)
                 .signWith(key)
