@@ -1,7 +1,7 @@
 package com.pm.bankcards.mapper;
 
 import com.pm.bankcards.dto.card.CardResponse;
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.entity.User;
 import org.junit.jupiter.api.Test;
 import com.pm.bankcards.entity.Card;
