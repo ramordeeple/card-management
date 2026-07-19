@@ -1,7 +1,7 @@
 package com.pm.bankcards.service.rules;
 
 import com.pm.bankcards.dto.transfer.TransferSide;
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.exception.CardNotActiveException;
 import org.springframework.stereotype.Component;
 import com.pm.bankcards.entity.Card;

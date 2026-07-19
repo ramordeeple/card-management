@@ -1,6 +1,6 @@
 package com.pm.bankcards.dto.card;
 
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package com.pm.bankcards.repository.view;
 
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 
 import java.math.BigDecimal;
 

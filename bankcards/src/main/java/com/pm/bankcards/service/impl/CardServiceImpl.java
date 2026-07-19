@@ -3,7 +3,7 @@ package com.pm.bankcards.service.impl;
 import com.pm.bankcards.dto.card.CardCreateRequest;
 import com.pm.bankcards.dto.card.CardFilter;
 import com.pm.bankcards.dto.card.CardResponse;
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
 import com.pm.bankcards.exception.ErrorCodes;

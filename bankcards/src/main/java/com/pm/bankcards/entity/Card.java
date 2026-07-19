@@ -1,7 +1,7 @@
 package com.pm.bankcards.entity;
 
+import com.pm.bankcards.security.CardStatus;
 import jakarta.persistence.*;
-import com.pm.bankcards.util.CryptoStringConverter;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;

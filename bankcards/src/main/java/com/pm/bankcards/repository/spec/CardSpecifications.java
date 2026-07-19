@@ -1,6 +1,6 @@
 package com.pm.bankcards.repository.spec;
 
-import com.pm.bankcards.entity.CardStatus;
+import com.pm.bankcards.security.CardStatus;
 import org.springframework.data.jpa.domain.Specification;
 import com.pm.bankcards.entity.Card;
 
