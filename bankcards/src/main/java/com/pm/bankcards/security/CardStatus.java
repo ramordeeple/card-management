@@ -1,4 +1,4 @@
-package com.pm.bankcards.entity;
+package com.pm.bankcards.security;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
