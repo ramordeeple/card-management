@@ -23,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final int STRENTGH = 10;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -51,7 +50,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/register"
                         ).permitAll()
 
-                        .requestMatchers("/api/v1/admin/debug/**").permitAll()
+//                        .requestMatchers("/api/v1/admin/debug/**").permitAll()
 
                         .requestMatchers("/api/v1/admin/**").hasRole(String.valueOf(RoleName.ADMIN))
 
@@ -82,7 +81,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(STRENTGH);
+        int STRENGTH = 10;
+        return new BCryptPasswordEncoder(STRENGTH);
     }
 
     @Bean
