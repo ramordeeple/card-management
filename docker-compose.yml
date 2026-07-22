@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   app:
+    env_file:
+      - .env
     build:
       context: ./bankcards
       dockerfile: Dockerfile
@@ -12,7 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_REDIS_HOST=redis
-
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - ADMIN_NAME=${ADMIN_NAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - SECURITY_JWT_SECRET=${SECURITY_JWT_SECRET}
