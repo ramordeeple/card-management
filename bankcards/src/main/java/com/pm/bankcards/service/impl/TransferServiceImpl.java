@@ -40,16 +40,22 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public void topUp(Long cardId, Long userId, BigDecimal amount, String requestId) {
         if (transfers.existsByRequestId(requestId))
-            throw new BusinessException(ErrorCodes.DUPLICATE_REQUEST, "Дублированный ID запроса");
+            throw new BusinessException(
+                    ErrorCodes.DUPLICATE_REQUEST,
+                    "Duplicated ID request");
 
         Card card = cards.findById(cardId)
                 .orElseThrow(() -> new NotFoundException("Card not found"));
 
         if (!card.getOwner().getId().equals(userId))
-            throw new BusinessException(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card not owned by user");
+            throw new BusinessException(
+                    ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED,
+                    "Card not owned by user");
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
-            throw new BusinessException(ErrorCodes.AMOUNT_INVALID, "Сумма перевода не может быть меньше или равно 0");
+            throw new BusinessException(
+                    ErrorCodes.AMOUNT_INVALID,
+                    "Transfer amount cannot be less or equal 0");
 
         card.setBalance(card.getBalance().add(amount));
 
@@ -70,12 +76,12 @@ public class TransferServiceImpl implements TransferService {
 
         Card from = cards.lockByIdAndOwnerId(req.fromCardId(), currentUserId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта отправителя не найдена",
+                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card sender not found",
                         Map.of("side", "FROM")));
 
         Card to = cards.lockByIdAndOwnerId(req.toCardId(), currentUserId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Карта получателя не найдена",
+                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card receiver not found",
                         Map.of("side", "TO")));
 
         TransferContext ctx = new TransferContext(from, to, req.amount(), req.requestId());
