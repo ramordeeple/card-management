@@ -6,19 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
 
 @Entity
 @Table(name = "cards")
 public class Card {
-    /**
-     */
+
     @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Convert(converter = CryptoStringConverter.class)
+    //    @Convert(converter = CryptoStringConverter.class)
     @Setter
     @Column(name = "card_number_enc", nullable = false, unique = true, length = 256)
     private String cardNumberEnc;
