@@ -2,6 +2,8 @@ package com.pm.bankcards.entity;
 
 import com.pm.bankcards.security.CardStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -9,31 +11,47 @@ import java.time.YearMonth;
 @Entity
 @Table(name = "cards")
 public class Card {
+    /**
+     */
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 //    @Convert(converter = CryptoStringConverter.class)
+    @Setter
     @Column(name = "card_number_enc", nullable = false, unique = true, length = 256)
     private String cardNumberEnc;
 
+    @Setter
+    @Getter
     @Column(name = "last4", length = 4, nullable = false)
     private String last4;
 
+    @Setter
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @Setter
+    @Getter
     @Column(name = "expiry_month", nullable = false)
     private int expiryMonth;
 
+    @Setter
+    @Getter
     @Column(name = "expiry_year", nullable = false)
     private int expiryYear;
 
+    @Setter
+    @Getter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     private CardStatus status = CardStatus.ACTIVE;
 
+    @Setter
+    @Getter
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
@@ -53,72 +71,6 @@ public class Card {
 
     public void activate() {
         this.status = CardStatus.ACTIVE;
-    }
-
-    public boolean isExpired() {
-        YearMonth expiry = YearMonth.of(expiryYear, expiryMonth);
-        return expiry.isBefore(YearMonth.now());
-    }
-
-    /************************/
-    public Long getId() {
-        return id;
-    }
-
-    public String getCardNumberEnc() {
-        return cardNumberEnc;
-    }
-
-    public void setCardNumberEnc(String cardNumberEnc) {
-        this.cardNumberEnc = cardNumberEnc;
-    }
-
-    public String getLast4() {
-        return last4;
-    }
-
-    public void setLast4(String last4) {
-        this.last4 = last4;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public int getExpiryMonth() {
-        return expiryMonth;
-    }
-
-    public void setExpiryMonth(int expiryMonth) {
-        this.expiryMonth = expiryMonth;
-    }
-
-    public int getExpiryYear() {
-        return expiryYear;
-    }
-
-    public void setExpiryYear(int expiryYear) {
-        this.expiryYear = expiryYear;
-    }
-
-    public CardStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CardStatus status) {
-        this.status = status;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
     }
 
 }
