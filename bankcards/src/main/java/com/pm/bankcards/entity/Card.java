@@ -2,6 +2,7 @@ package com.pm.bankcards.entity;
 
 import com.pm.bankcards.security.CardStatus;
 import jakarta.persistence.*;
+import jdk.jfr.Description;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class Card {
     //    @Convert(converter = CryptoStringConverter.class)
     @Setter
     @Column(name = "card_number_enc", nullable = false, unique = true, length = 256)
+    @Description("Though it's marked as assigned but never accessed do not remove it")
     private String cardNumberEnc;
 
     @Setter
