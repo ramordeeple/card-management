@@ -75,15 +75,14 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
         long start = System.currentTimeMillis();
 
         try (executor) {
-            IntStream.range(0, count)
-                    .forEach(i -> executor.submit(() ->
-                        seedCard(owner, type,  i)
-                    ));
-
-            if (executor instanceof ThreadPoolExecutor) {
-                executor.shutdown();
-                executor.awaitTermination(TERMINATION_TIMEOUT_MIN, TimeUnit.MINUTES);
+            for (int i = 0; i < count; i++) {
+                var index = i;
+                executor.submit(() -> seedCard(owner, type, index));
             }
+
+            executor.shutdown();
+            executor.awaitTermination(TERMINATION_TIMEOUT_MIN, TimeUnit.MINUTES);
+
         } catch (InterruptedException e) {
             log.error("{} seeder was interrupted", type);
             Thread.currentThread().interrupt();
