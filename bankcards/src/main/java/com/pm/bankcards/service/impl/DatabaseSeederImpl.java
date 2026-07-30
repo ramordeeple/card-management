@@ -36,22 +36,25 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
     private static final int CLASSIC_THREAD_COUNT = 20;
     private static final int DB_LATENCY_MS = 10;
     private static final int TERMINATION_TIMEOUT_MIN = 30;
+    private static final int REQUEST_CARDS_COUNT = 10000;
 
     @Override
     public void seedCards(User owner, int count) {
-        log.info("Starting Modern generation (Virtual Threads) for user: {}", owner.getUsername());
+        log.info("Starting Modern generation (Virtual Threads) for user: {}",
+                owner.getUsername());
         runSeeding(Executors.newVirtualThreadPerTaskExecutor(), owner, count, "virtual");
     }
 
     @Override
     public void seedCardsClassic(User owner, int count) {
-        log.info("Starting Classic generation (Fixed Pool: {}) for user: {}", owner.getUsername(), owner.getUsername());
+        log.info("Starting Classic generation (Fixed Pool: {}) for user: {}",
+                owner.getUsername(), owner.getUsername());
         runSeeding(Executors.newFixedThreadPool(CLASSIC_THREAD_COUNT), owner, count, "classic");
     }
 
     @Override
     public void startLoadTest(Long cardId) {
-        final int requestCount = 10000;
+        final int requestCount = REQUEST_CARDS_COUNT;
 
         Thread.startVirtualThread(() -> {
             log.info("Starting load test for card {}", cardId);
@@ -72,25 +75,10 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
         long start = System.currentTimeMillis();
 
         try (executor) {
-            IntStream.range(0, count).forEach(i -> executor.submit(() -> {
-                try {
-                    Thread.sleep(DB_LATENCY_MS);
-
-                    String rawPan = cardNumberProvider.generate(defaultBin, i);
-
-                    silentlyFindCards(owner.getId());
-
-                    CardCreateRequest request = new CardCreateRequest(rawPan, 12, 2034, owner.getId());
-                    cardAdminService.create(request, owner);
-
-                    meterRegistry.counter("cards_seeded_total", "type", type).increment();
-
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } catch (Exception e) {
-                    log.error("Error during {} seeding at index {}: {}", type, i, e.getMessage());
-                }
-            }));
+            IntStream.range(0, count)
+                    .forEach(i -> executor.submit(() ->
+                        seedCard(owner, type,  i)
+                    ));
 
             if (executor instanceof ThreadPoolExecutor) {
                 executor.shutdown();
@@ -104,9 +92,39 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
         log.info("{} seeding completed in {} ms", type, System.currentTimeMillis() - start);
     }
 
+    private void seedCard(User owner, String type, int index) {
+        try {
+            Thread.sleep(DB_LATENCY_MS);
+
+            String rawPan = cardNumberProvider.generate(defaultBin, index);
+
+            silentlyFindCards(owner.getId());
+
+            CardCreateRequest request = new CardCreateRequest(rawPan,
+                    12,
+                    2034,
+                    owner.getId());
+
+            cardAdminService
+                    .create(request, owner);
+
+            meterRegistry
+                    .counter("cards_seeded_total", "type", type).increment();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            log.error("Error during {} seeding at index {}: {}", type, index, e.getMessage());
+        }
+    }
+
     private void silentlyFindCards(Long userId) {
         try {
-            cardQueryService.findMyCards(userId, PageRequest.of(0, 10), new CardFilter(null, null, null));
+            cardQueryService.findMyCards(
+                    userId,
+                    PageRequest.of(0, 10),
+                    new CardFilter(null, null, null));
+
             meterRegistry.counter("test_read_operations_total").increment();
         } catch (Exception e) {
             log.warn("Read failed during seeding: {}", e.getMessage());
