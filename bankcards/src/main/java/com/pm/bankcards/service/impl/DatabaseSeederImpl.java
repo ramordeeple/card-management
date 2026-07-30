@@ -81,7 +81,8 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
             }
 
             executor.shutdown();
-            executor.awaitTermination(TERMINATION_TIMEOUT_MIN, TimeUnit.MINUTES);
+            if (!executor.awaitTermination(TERMINATION_TIMEOUT_MIN, TimeUnit.MINUTES))
+                log.warn("{} seeding timeout exceeded", type);
 
         } catch (InterruptedException e) {
             log.error("{} seeder was interrupted", type);
