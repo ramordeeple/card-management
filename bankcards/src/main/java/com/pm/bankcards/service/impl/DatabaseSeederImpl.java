@@ -68,7 +68,7 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
             }
         });
 
-        log.info("Load test executed for card for {} requests", requestCount);
+        log.info("Load test completed for card for {} requests", requestCount);
     }
 
     private void runSeeding(ExecutorService executor, User owner, int count, String type) {
