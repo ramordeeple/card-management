@@ -38,23 +38,23 @@ public class SecurityConfig {
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/v3/api-docs.yaml",
-                                "/actuator/**"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/api/v1/auth/login",
-                                "/api/v1/auth/register"
-                        ).permitAll()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**",
+                                        "/v3/api-docs.yaml",
+                                        "/actuator/**"
+                                ).permitAll()
+                                .requestMatchers(
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/register"
+                                ).permitAll()
 
 //                        .requestMatchers("/api/v1/admin/debug/**").permitAll()
 
-                        .requestMatchers("/api/v1/admin/**").hasRole(String.valueOf(RoleName.ADMIN))
+                                .requestMatchers("/api/v1/admin/**").hasRole(String.valueOf(RoleName.ADMIN))
 
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) ->
