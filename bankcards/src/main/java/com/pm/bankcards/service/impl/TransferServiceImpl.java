@@ -72,7 +72,9 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public Transfer doOwnTransfer(TransferRequest req, Long currentUserId) {
         if (transfers.existsByRequestId(req.requestId()))
-            return transfers.findByRequestId(req.requestId()).orElseThrow();
+            return transfers
+                    .findByRequestId(req.requestId())
+                    .orElseThrow();
 
         Card from = cards.lockByIdAndOwnerId(req.fromCardId(), currentUserId)
                 .orElseThrow(() -> new BusinessException(
