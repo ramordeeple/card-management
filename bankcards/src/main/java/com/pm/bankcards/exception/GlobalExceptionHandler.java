@@ -49,8 +49,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         ErrorResponse body = new ErrorResponse(
                 Instant.now().toString(),
-                "TYPE_MISMATCH",
-                "Некорректный тип параметра: " + ex.getName(),
+                ErrorCodes.TYPE_MISMATCH.name(),
+                "Incorrect parameter type: " + ex.getName(),
                 Map.of("value", ex.getValue())
         );
         return ResponseEntity.badRequest().body(body);
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnknown(Exception ex, WebRequest req) {
         ErrorResponse body = new ErrorResponse(
                 Instant.now().toString(),
-                "UNKNOWN_ERROR",
+                ErrorCodes.UNKNOWN_ERROR.name(),
                 ex.getMessage(),
                 null
         );

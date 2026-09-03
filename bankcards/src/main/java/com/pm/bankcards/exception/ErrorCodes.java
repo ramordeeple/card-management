@@ -24,5 +24,6 @@ public enum ErrorCodes {
     DUPLICATE_REQUEST,
 
     /// Other
-    UNKNOWN_ERROR
+    UNKNOWN_ERROR,
+    TYPE_MISMATCH
 }
