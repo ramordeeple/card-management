@@ -1,15 +1,15 @@
 # 🏦 **Card Management - Bankcards**
 
-### Сервис управления банковскими картами.
-* **ADMIN:** выпуск / блокировка / активация карт
-* **USER:** просмотр и переводы между своими картами
-* JWT-аутентификация, фильтры, пагинация, Liquibase, Swagger
+### Bank card management service.
+* **ADMIN:** issue / block / activate cards
+* **USER:** view cards and transfer funds between your own cards
+* JWT authentication, filtering, pagination, Liquibase, Swagger
 
 ---
 
-## ⚙️ **Стек технологий**
+## ⚙️ **Technology Stack**
 
-| Компонент       | Технологии                                                      |
+| Component       | Technologies                                                      |
 | --------------- | --------------------------------------------------------------- |
 | Backend         | Java 17+, Spring Boot 3, Spring Security (JWT), Spring Data JPA |
 | Database        | PostgreSQL, Liquibase, Redis                                    |
@@ -20,23 +20,23 @@
 
 ---
 
-## 🧱 **Архитектура проекта**
+## 🧱 **Project Architecture**
 
 ```
-controller/    — REST-контроллеры (DTO ↔ сервисы)
-service/       — бизнес-логика (переводы, статусы)
+controller/    — REST controllers (DTOs ↔ services)
+service/       — business logic (transfers, statuses)
 repository/    — Spring Data JPA
-security/      — JWT, фильтры, UserDetailsService
-exception/     — глобальный обработчик ошибок
-dto/           — запросы/ответы API
+security/      — JWT, filters, UserDetailsService
+exception/     — global error handler
+dto/           — API requests/responses
 resources/db/  — Liquibase changelogs
 ```
 
 ---
 
-## 🚀 **Быстрый старт**
+## 🚀 **Quick Start**
 
-### 1️⃣ Предварительные требования
+### 1️⃣ Prerequisites
 
 * ☕ Java 17+ 
 * 🧱 Maven 3.9+
@@ -45,17 +45,17 @@ resources/db/  — Liquibase changelogs
 
 ---
 
-### 2️⃣ Поднять базу данных (PostgreSQL)
+### 2️⃣ Start the Database (PostgreSQL)
 
-В корне проекта:
+From the project root:
 
 ```bash
 docker compose up -d
 ```
 
-Будут применены указанные ниже параметры значений:
+The following settings will be used:
 
-| Параметр | Значение  |
+| Parameter | Value  |
 | -------- | --------- |
 | Host     | localhost |
 | Port     | 5433      |
@@ -63,62 +63,62 @@ docker compose up -d
 | Username | bank      |
 | Password | bank      |
 
-Либо же правой кнопкой мыши по `docker-compose.yml` и `Run 'bank-cards-db'`
+Alternatively, right-click `docker-compose.yml` and select `Run 'bank-cards-db'`
 
-> ⚠️ Порт 5433 выбран, чтобы не конфликтовать с локальным 5432.
-
----
-
-### 3️⃣ Настройка секретов (JWT / шифрование)
-
-#### 💡 Настройка переменных окружения в IntelliJ IDEA
-
-1. Откройте **Run → Edit Configurations...**
-2. Выберите конфигурацию `BankCardsApplication`
-3. В правом верхнем углу нажмите **Modify options → Environment variables**
-4. В появившейся секции кликните на иконку
-5. Выберите уже готовый `.env.example` в корне проекта, как шаблон с **переменными средами**
-6. Нажмите **Apply → OK** и запустите на кнопку `Run`
-
-> 💡 Теперь все переменные из `.env.example` будут автоматически подставляться в среду исполнения при запуске из IntelliJ IDEA.
+> ⚠️ Port 5433 is used to avoid conflicts with a local database on port 5432.
 
 ---
 
-### 4️⃣ Запуск приложения
+### 3️⃣ Configure Secrets (JWT / Encryption)
+
+#### 💡 Configure Environment Variables in IntelliJ IDEA
+
+1. Open **Run → Edit Configurations...**
+2. Select the `BankCardsApplication` configuration
+3. In the upper-right corner, click **Modify options → Environment variables**
+4. Click the icon in the section that appears
+5. Select the existing `.env.example` in the project root as the **environment variables** template
+6. Click **Apply → OK**, then click `Run` to start the application
+
+> 💡 All variables from `.env.example` will now be loaded automatically into the runtime environment when launching from IntelliJ IDEA.
+
+---
+
+### 4️⃣ Run the Application
 
 **IntelliJ IDEA:** Run → `BankCardsApplication`
 
-📍 Приложение доступно по адресу: [http://localhost:8080](http://localhost:8080)
+📍 The application is available at: [http://localhost:8080](http://localhost:8080)
 
-> ⚠️ Будут применены миграции. Убедитесь, что в **Docker Desktop** появился и включен контейнер `bankcards`,
-> а также будут созданы два тестовых пользователя `ADMIN` и `USER`.
+> ⚠️ Database migrations will be applied. Make sure the `bankcards` container exists and is running in **Docker Desktop**.
+> Two test users, `ADMIN` and `USER`, will also be created.
 
 ---
 
-## 📘 **API документация**
+## 📘 **API Documentation**
 
-| Тип          | URL                                                                              |
+| Type          | URL                                                                              |
 | ------------ | -------------------------------------------------------------------------------- |
 | Swagger UI   | [http://localhost:8080/swagger-ui](http://localhost:8080/swagger-ui)             |
 | OpenAPI JSON | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)           |
 | OpenAPI YAML | [http://localhost:8080/v3/api-docs.yaml](http://localhost:8080/v3/api-docs.yaml) |
 
-> 🔓 Swagger UI доступен без авторизации.
+> 🔓 Swagger UI is accessible without authentication.
 
 ---
 
-## 🗃️ **Liquibase (миграции)**
+## 🗃️ **Liquibase (Migrations)**
 
-* Каталог: `src/main/resources/db/migration/`
-* Точка входа: `changelog-master.yaml`
-* Автозапуск при старте (`spring.liquibase.enabled=true`)
+* Directory: `src/main/resources/db/migration/`
+* Entry point: `changelog-master.yaml`
+* Runs automatically on startup (`spring.liquibase.enabled=true`)
 
-Таблицы после миграции: `users`, `roles`, `user_roles`, `cards`, `transfers`, `databasechangelog*`
+Tables after migration: `users`, `roles`, `user_roles`, `cards`, `transfers`, `databasechangelog*`
 
-> ⚠️ Запускается при старте приложения. Убедитесь, что в **Docker Desktop** появился и включен контейнер `bankcards`. 
+> ⚠️ Runs on application startup. Make sure the `bankcards` container exists and is running in **Docker Desktop**.
 ---
 
-## ⚙️ **Конфигурация (Примеры application.yml и .env.example)**
+## ⚙️ **Configuration (application.yml and .env.example Examples)**
 ### 1) **application.yml**
 ```yaml
 spring:
@@ -157,113 +157,113 @@ DB_USERNAME=bank
 DB_PASSWORD=bank
 ```
 
-> 💡 При необходимости можно поменять ключи `SECURITY_JWT_SECRET` и `SECURITY_ENC_KEY` на нужные. 
-> `DB_` значения берутся из `docker-compose.yml`.
+> 💡 You can replace the `SECURITY_JWT_SECRET` and `SECURITY_ENC_KEY` keys as needed.
+> The `DB_` values come from `docker-compose.yml`.
 ---
 
-## 🧪 **Тестирование**
+## 🧪 **Testing**
 
-### Через IntelliJ IDEA:
+### Using IntelliJ IDEA:
 
-1. Откройте проект в **IntelliJ IDEA**
-2. Найдите папку с тестами: `src/test/java`
-3. Кликните правой кнопкой на папку **java**
-4. Выберите `Run 'Tests in 'java''`
-5. Для интеграционных тестов убедитесь, что **Docker Desktop** с контейнером `bankcards` включен
+1. Open the project in **IntelliJ IDEA**
+2. Locate the test directory: `src/test/java`
+3. Right-click the **java** directory
+4. Select `Run 'Tests in 'java''`
+5. For integration tests, make sure **Docker Desktop** and the `bankcards` container are running
 
-### Покрытие:
+### Test Coverage:
 
-* `TransferServiceImplTest` — логика переводов
-* `CardAdminServiceImplTest` — операции администратора
+* `TransferServiceImplTest` — transfer logic
+* `CardAdminServiceImplTest` — administrator operations
 * `CardControllerTest` — REST API MockMvc
-* `SecurityIT` — доступ к эндпоинтам
-* `ApplicationIT` — интеграционный тест
+* `SecurityIT` — endpoint access
+* `ApplicationIT` — integration test
 
 ---
 
 ## 🌐 **HTTP Client (`api-samples.http`)**
 
-По умолчанию, после запуска приложения, создаются два проверочных пользоваться `USER`/`user123` и `ADMIN`/`admin123` в `bootstrap/AdminBootstrap`
+By default, two test users, `USER`/`user123` and `ADMIN`/`admin123`, are created on application startup by `bootstrap/AdminBootstrap`
 
-> 📁 Файл в корне проекта:`requests/api-samples.http` имеет примеры работы **API**
+> 📁 The file `requests/api-samples.http`, relative to the project root, contains **API** usage examples
 
-### 💳 **Сценарии**
+### 💳 **Scenarios**
 
 #### 👨‍💼 ADMIN
 
-- Создаёт карту пользователю (`POST /api/v1/admin/cards`)
-- Номер карты сохраняется в **базе данных** в **зашифрованном виде** — шифруется с помощью `SECURITY_ENC_KEY`.
-- Может **активировать**, **заблокировать** и **удалить** карту через `/api/v1/admin/cards/{id}/...`
+- Creates a card for a user (`POST /api/v1/admin/cards`)
+- The card number is stored in the **database** in **encrypted form**, using `SECURITY_ENC_KEY` for encryption.
+- Can **activate**, **block**, and **delete** a card via `/api/v1/admin/cards/{id}/...`
 
 #### 🙋‍♂️ USER
 
-- Просматривает список своих карт: `GET /api/v1/cards`
-- Проверяет баланс карты: `GET /api/v1/cards/{id}/balance`
-- Может пополнять баланс своей карты (`POST /transfers/top-up`)
-- Делает переводы между своими картами (`POST /transfers/own`), при этом система проверяет владельца, баланс и создаёт запись в истории переводов
-- Может запросить блокировку своей карты (`POST /api/v1/cards/{id}/block`)
-> 💡 Все действия требуют валидного JWT токена пользователя/администратора
+- Lists their own cards: `GET /api/v1/cards`
+- Checks a card balance: `GET /api/v1/cards/{id}/balance`
+- Can top up their own card balance (`POST /transfers/top-up`)
+- Transfers funds between their own cards (`POST /transfers/own`); the system verifies ownership and balance, then creates a transfer history record
+- Can request that their own card be blocked (`POST /api/v1/cards/{id}/block`)
+> 💡 All actions require a valid user/administrator JWT token
 
 ---
 
 ## **⚡ Highload & Performance Optimization**
 
-Проект спроектирован с учетом требований к современным высоконагруженным системам (Highload).
+The project is designed to meet the requirements of modern high-load systems.
 
 ### **🧵 Java 21 Virtual Threads**
 
-В отличие от классической модели "thread-per-request", где каждый поток потребляет \~1МБ памяти, приложение использует **виртуальные потоки**:
+Unlike the classic "thread-per-request" model, where each thread consumes \~1 MB of memory, the application uses **virtual threads**:
 
-* Позволяют обрабатывать тысячи конкурентных запросов без блокировки системных ресурсов.
-* Идеально подходят для I/O-интенсивных операций (запросы к БД и Redis).
-* Для активации используется: spring.threads.virtual.enabled: true.
+* Handle thousands of concurrent requests without tying up system resources.
+* Are well suited to I/O-intensive operations (database and Redis queries).
+* Enable them with: spring.threads.virtual.enabled: true.
 
 ### **🚀 Redis Caching Strategy**
 
-Для минимизации нагрузки на PostgreSQL реализовано кэширование:
+Caching is implemented to minimize the load on PostgreSQL:
 
-* **Чтение данных:** Детальная информация о картах кэшируется в Redis (@Cacheable).
-* **Инвалидация:** При любом изменении состояния карты (блокировка, активация, перевод) кэш автоматически сбрасывается (@CacheEvict), обеспечивая консистентность.
-* **Результат:** Время отклика сокращается с \~20мс до \<2мс.
+* **Reading data:** Card details are cached in Redis (@Cacheable).
+* **Invalidation:** Any change to a card’s state (blocking, activation, transfer) automatically evicts the cached data (@CacheEvict) to maintain consistency.
+* **Result:** Response time decreases from \~20 ms to \<2 ms.
 
 ### **📊 Monitoring (Observability)**
 
-Для анализа состояния системы в режиме реального времени развернут стек мониторинга:
+A monitoring stack is deployed to analyze system health in real time:
 
-* **Prometheus:** Сбор метрик приложения (latency, throughput, error rate).
-* **Grafana:** Визуализация метрик (дашборды для мониторинга ресурсов и бизнес-показателей).
-* **Micrometer:** Инструментация кода для экспорта метрик в формате Prometheus.
+* **Prometheus:** Collects application metrics (latency, throughput, error rate).
+* **Grafana:** Visualizes metrics (dashboards for monitoring resources and business metrics).
+* **Micrometer:** Instruments the code to export metrics in Prometheus format.
 
-## **📈 Нагрузочное тестирование (Load Check)**
+## **📈 Load Testing (Load Check)**
 
-Можно проверить производительность системы, используя встроенные эндпоинты и файлы .http.
+You can test system performance using the built-in endpoints and .http files.
 
-### **Сценарии тестирования**
+### **Test Scenarios**
 
-#### **1\. Проверка работы виртуальных потоков**
+#### **1\. Verify Virtual Threads**
 
-Позволяет убедиться, что запросы обрабатываются именно виртуальными потоками Java 21\.
+Verifies that requests are processed by Java 21 virtual threads.
 
 \#\#\# Check thread info  
 GET {{baseUrl}}/api/v1/cards/thread-test
 
-*В ответе будет имя потока: VirtualThread\[...\].*
+*The response will contain the thread name: VirtualThread\[...\].*
 
-#### **2\. Проверка кэширования в Redis**
+#### **2\. Verify Redis Caching**
 
-Первый запрос обратится к БД, все последующие — к оперативной памяти Redis.
+The first request queries the database; all subsequent requests read from Redis memory.
 
 \#\#\# Get card details (populates/reads from cache)  
 GET http://localhost:8080/api/v1/cards/1
 
-#### **3\. Стресс-тест (Loadcheck)**
+#### **3\. Stress Test (Loadcheck)**
 
-Запуск массовой генерации запросов для проверки стабильности пула соединений и скорости работы кэша.
+Generates a large volume of requests to test connection pool stability and cache performance.
 
 \#\#\# Loadcheck (Simulate 100,000+ operations)  
 POST http://localhost:8080/api/v1/cards/load-test/1
 
-*Во время теста будет всплеск активности на графиках в Grafana.*
+*During the test, the Grafana charts will show a spike in activity.*
 
 
 
