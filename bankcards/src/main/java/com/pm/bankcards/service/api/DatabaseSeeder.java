@@ -31,6 +31,7 @@ public interface DatabaseSeeder {
      * Initiates a high-concurrency load test.
      * Utilizes Virtual Threads to simulate massive traffic against the card system.
      * * @param cardId the card ID to target for repeated queries
+     * @param currentUserId ID of the authenticated card owner
      */
-    void startLoadTest(Long cardId);
+    void startLoadTest(Long cardId, Long currentUserId);
 }
