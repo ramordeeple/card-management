@@ -77,15 +77,17 @@ public class CardController {
 
     @PostMapping("/load-test/{cardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void runLoadTest(@PathVariable Long cardId) {
-        databaseSeeder.startLoadTest(cardId);
+    public void runLoadTest(@PathVariable Long cardId,
+                            @AuthenticationPrincipal(expression = "id") Long currentUserId) {
+        databaseSeeder.startLoadTest(cardId, currentUserId);
         log.info("Load test started for {} card", cardId);
     }
 
 
     @GetMapping("/{cardId}")
     @ApiResponse(responseCode = "404", description = "Card not found")
-    public CardResponse getCardDetails(@PathVariable Long cardId) {
-        return cardQueryService.getCardDetails(cardId);
+    public CardResponse getCardDetails(@PathVariable Long cardId,
+                                       @AuthenticationPrincipal(expression = "id") Long currentUserId) {
+        return cardQueryService.getCardDetails(cardId, currentUserId);
     }
 }
