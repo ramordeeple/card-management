@@ -16,6 +16,9 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificationExecutor<Card> {
     Optional<Card> findByIdAndOwnerId(Long id, Long ownerId);
 
+    @Query("select c.version from Card c where c.id = :id and c.owner.id = :ownerId")
+    Optional<Long> findVersionByIdAndOwnerId(@Param("id") Long id, @Param("ownerId") Long ownerId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from Card c where c.id = :id and c.owner.id = :ownerId")
     Optional<Card> lockByIdAndOwnerId(@Param("id") Long id, @Param("ownerId") Long ownerId);
