@@ -15,6 +15,8 @@ public record TransferRequest(
         Long toCardId,
 
         @Schema(example = "100.00", description = "Transfer amount")
+        @NotNull
+        @Digits(integer = 13, fraction = 2)
         @DecimalMin(value = "0.01", message = "Transfer amount should be positive")
         BigDecimal amount,
 
