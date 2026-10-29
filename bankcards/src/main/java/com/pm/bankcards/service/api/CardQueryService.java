@@ -41,7 +41,8 @@ public interface CardQueryService {
      * Retrieves full details of a card.
      * Implementation typically uses Redis caching for high-load optimization.
      * * @param cardId unique identifier of the card
+     * @param currentUserId ID of the authenticated card owner
      * @return {@link CardResponse} with detailed information
      */
-    CardResponse getCardDetails(Long cardId);
+    CardResponse getCardDetails(Long cardId, Long currentUserId);
 }
