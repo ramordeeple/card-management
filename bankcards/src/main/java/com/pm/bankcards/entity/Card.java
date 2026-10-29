@@ -17,6 +17,14 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /* *
+    * For redis caching
+    * */
+    @Getter
+    @Version
+    @Column(nullable = false)
+    private long version;
+
     //    @Convert(converter = CryptoStringConverter.class)
     @Setter
     @Column(name = "card_number_enc", nullable = false, unique = true, length = 256)
