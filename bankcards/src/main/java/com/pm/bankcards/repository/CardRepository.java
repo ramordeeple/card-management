@@ -22,6 +22,4 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from Card c where c.id = :id and c.owner.id = :ownerId")
     Optional<Card> lockByIdAndOwnerId(@Param("id") Long id, @Param("ownerId") Long ownerId);
-
-    Page<CardListView> findAllByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 }
