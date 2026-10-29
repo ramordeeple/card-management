@@ -53,7 +53,8 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
     }
 
     @Override
-    public void startLoadTest(Long cardId) {
+    public void startLoadTest(Long cardId, Long currentUserId) {
+        cardQueryService.getCardDetails(cardId, currentUserId);
         final int requestCount = REQUEST_CARDS_COUNT;
 
         Thread.startVirtualThread(() -> {
@@ -62,7 +63,7 @@ public class DatabaseSeederImpl implements DatabaseSeeder {
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
                 for (int i = 0; i < requestCount; i++) {
                     executor.submit(() -> {
-                        cardQueryService.getCardDetails(cardId);
+                        cardQueryService.getCardDetails(cardId, currentUserId);
                     });
                 }
             }
