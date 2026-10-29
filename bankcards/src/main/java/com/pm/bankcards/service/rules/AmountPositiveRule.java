@@ -11,11 +11,15 @@ public class AmountPositiveRule implements TransferRule {
 
     @Override
     public void check(TransferContext ctx) {
-        if (ctx.amount() == null || ctx.amount().signum() <= 0) {
+        if (ctx.amount() == null ||
+                ctx.amount().signum() <= 0 ||
+                ctx.amount().stripTrailingZeros().scale() > 2) {
             throw new BusinessException(
                     ErrorCodes.AMOUNT_INVALID,
-                    "Transfer amount should be positive",
-                    Map.of("amount", ctx.amount())
+                    "Transfer amount must be positive and have at most two decimal places",
+                    ctx.amount() == null ?
+                            Map.of() :
+                            Map.of("amount", ctx.amount())
             );
         }
     }
