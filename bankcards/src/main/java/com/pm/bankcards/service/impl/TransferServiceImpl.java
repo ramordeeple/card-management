@@ -8,6 +8,7 @@ import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.TransferRepository;
+import com.pm.bankcards.service.CardDetailsCache;
 import com.pm.bankcards.service.api.TransferService;
 import com.pm.bankcards.service.rules.TransferContext;
 import com.pm.bankcards.service.rules.TransferRule;
@@ -28,13 +29,16 @@ public class TransferServiceImpl implements TransferService {
     private final TransferRepository transfers;
     private final CardRepository cards;
     private final List<TransferRule> rules;
+    private final CardDetailsCache cache;
 
     public TransferServiceImpl(TransferRepository transfers,
                                CardRepository cards,
-                               List<TransferRule> rules) {
+                               List<TransferRule> rules,
+                               CardDetailsCache cache) {
         this.transfers = transfers;
         this.cards = cards;
         this.rules = rules;
+        this.cache = cache;
     }
 
     @Override
@@ -44,20 +48,17 @@ public class TransferServiceImpl implements TransferService {
                     ErrorCodes.DUPLICATE_REQUEST,
                     "Duplicated ID request");
 
-        Card card = cards.findById(cardId)
+        Card card = cards.lockByIdAndOwnerId(cardId, userId)
                 .orElseThrow(() -> new NotFoundException("Card not found"));
 
-        if (!card.getOwner().getId().equals(userId))
-            throw new BusinessException(
-                    ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED,
-                    "Card not owned by user");
-
-        if (amount.compareTo(BigDecimal.ZERO) <= 0)
+        if (amount == null || amount.signum() <= 0 || amount.stripTrailingZeros().scale() > 2)
             throw new BusinessException(
                     ErrorCodes.AMOUNT_INVALID,
-                    "Transfer amount cannot be less or equal 0");
+                    "Amount must be positive and have at most two decimal places"
+            );
 
-        card.setBalance(card.getBalance().add(amount));
+        cache.evict(cardId, card.getVersion());
+        card.deposit(amount);
 
         Transfer t = new Transfer();
         t.setFromCard(null);
@@ -71,35 +72,73 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Transfer doOwnTransfer(TransferRequest req, Long currentUserId) {
-        if (transfers.existsByRequestId(req.requestId()))
-            return transfers
-                    .findByRequestId(req.requestId())
-                    .orElseThrow();
+        if (transfers.existsByRequestId(req.requestId())) {
+            return getOwnedTransfer(req.requestId(), currentUserId);
+        }
 
-        Card from = cards.lockByIdAndOwnerId(req.fromCardId(), currentUserId)
+        TransferContext context = lockTransferCards(req, currentUserId);
+        for (TransferRule rule : rules)
+            rule.check(context);
+
+        updateBalances(context);
+
+        return saveTransfer(context);
+    }
+
+    private Transfer getOwnedTransfer(String requestId, Long userId) {
+        Transfer transfer = transfers.findByRequestId(requestId).orElseThrow();
+        if (transfer.getFromCard() == null
+                || !transfer.getFromCard().getOwner().getId().equals(userId)
+                || !transfer.getToCard().getOwner().getId().equals(userId)) {
+            throw new BusinessException(
+                    ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED,
+                    "Transfer not owned by user");
+        }
+
+        return transfer;
+    }
+
+    private TransferContext lockTransferCards(TransferRequest req, Long userId) {
+        Card from;
+        Card to;
+        if (req.fromCardId().compareTo(req.toCardId()) <= 0) {
+            from = lockCard(req.fromCardId(), userId, "FROM");
+            to = lockCard(req.toCardId(), userId, "TO");
+        } else {
+            to = lockCard(req.toCardId(), userId, "TO");
+            from = lockCard(req.fromCardId(), userId, "FROM");
+        }
+
+        return new TransferContext(from, to, req.amount(), req.requestId());
+    }
+
+    private void updateBalances(TransferContext context) {
+        Card from = context.from();
+        Card to = context.to();
+        cache.evict(from.getId(), from.getVersion());
+        cache.evict(to.getId(), to.getVersion());
+        from.withdraw(context.amount());
+        to.deposit(context.amount());
+    }
+
+    private Transfer saveTransfer(TransferContext context) {
+        Transfer transfer = new Transfer();
+        transfer.setFromCard(context.from());
+        transfer.setToCard(context.to());
+        transfer.setAmount(context.amount());
+        transfer.setRequestId(context.requestId());
+
+        return transfers.save(transfer);
+    }
+
+    private Card lockCard(Long cardId, Long userId, String side) {
+        return cards.lockByIdAndOwnerId(cardId, userId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card sender not found",
-                        Map.of("side", "FROM")));
-
-        Card to = cards.lockByIdAndOwnerId(req.toCardId(), currentUserId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED, "Card receiver not found",
-                        Map.of("side", "TO")));
-
-        TransferContext ctx = new TransferContext(from, to, req.amount(), req.requestId());
-
-        for (TransferRule rule : rules) rule.check(ctx);
-
-        from.withdraw(req.amount());
-        to.deposit(req.amount());
-
-        Transfer t = new Transfer();
-        t.setFromCard(from);
-        t.setToCard(to);
-        t.setAmount(req.amount());
-        t.setRequestId(req.requestId());
-
-        return transfers.save(t);
+                        ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED,
+                        "FROM".equals(side) ?
+                                "Card sender not found" :
+                                "Card receiver not found",
+                        Map.of("side", side)));
     }
 
 }
