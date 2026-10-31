@@ -10,13 +10,12 @@ import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.exception.NotFoundException;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.spec.CardSpecifications;
+import com.pm.bankcards.service.CardDetailsCache;
 import com.pm.bankcards.service.api.CardAdminService;
 import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.service.crypto.EncryptionService;
 import com.pm.bankcards.entity.Card;
 import com.pm.bankcards.mapper.CardMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,26 +32,32 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
     private final CardRepository cards;
     private final CardMapper mapper;
     private final EncryptionService encryption;
+    private final CardDetailsCache cache;
 
-    public CardServiceImpl(CardRepository cards, CardMapper mapper, EncryptionService encryption) {
+    public CardServiceImpl(CardRepository cards, CardMapper mapper, EncryptionService encryption, CardDetailsCache cache) {
         this.cards = cards;
         this.mapper = mapper;
         this.encryption = encryption;
+        this.cache = cache;
     }
 
     @Transactional
     @Override
     public Page<CardResponse> findMyCards(Long currentUserId, Pageable pageable, CardFilter filter) {
         var status = filter != null ? filter.status() : null;
+
         var last4 = (filter != null && filter.last4() != null &&
-                !filter.last4().isBlank()) ? filter.last4() : null;
+                !filter.last4().isBlank()) ?
+                filter.last4() :
+                null;
+
         var expiryYear = (filter != null) ? filter.expiryYear() : null;
 
         Specification<Card> spec = Specification.allOf(
-            CardSpecifications.ownerId(currentUserId),
-            CardSpecifications.status(status),
-            CardSpecifications.last4(last4),
-            CardSpecifications.expiryYear(expiryYear)
+                CardSpecifications.ownerId(currentUserId),
+                CardSpecifications.status(status),
+                CardSpecifications.last4(last4),
+                CardSpecifications.expiryYear(expiryYear)
         );
 
         return cards.findAll(spec, pageable).map(mapper::toDto);
@@ -66,22 +71,25 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
                 .orElseThrow(() -> new NotFoundException("Card not found or does not belong to you"));
     }
 
+    @Transactional
     public void requestBlock(Long cardId, Long currentUserId) {
-        Card card = cards.findByIdAndOwnerId(cardId, currentUserId)
+        Card card = cards.lockByIdAndOwnerId(cardId, currentUserId)
                 .orElseThrow(() -> new NotFoundException("Card not found or does not belong to you"));
 
         if (card.getStatus() == CardStatus.BLOCKED)
             throw new BusinessException(ErrorCodes.CARD_ALREADY_BLOCKED, "Card is blocked already", Map.of("cardId", cardId));
 
+        cache.evict(cardId, card.getVersion());
         card.block();
     }
 
     @Override
-    @Cacheable(value = "cards", key = "#cardId")
-    public CardResponse getCardDetails(Long cardId) {
-        return cards.findById(cardId)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new NotFoundException("Card not found"));
+    public CardResponse getCardDetails(Long cardId, Long currentUserId) {
+        // This owner check runs on cache hits too. A new version cannot use a late, stale cache fill.
+        long version = cards.findVersionByIdAndOwnerId(cardId, currentUserId)
+                .orElseThrow(() -> new NotFoundException("Card not found or does not belong to you"));
+
+        return cache.get(cardId, version);
     }
 
     @Transactional
@@ -100,7 +108,6 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         return mapper.toDto(card);
     }
 
-    @CacheEvict(value = "cards", key = "#cardId")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     @Override
@@ -108,6 +115,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         Card card = cards.findById(cardId)
                 .orElseThrow(() -> new NotFoundException("Card not found"));
 
+        cache.evict(cardId, card.getVersion());
         card.block();
     }
 
@@ -118,6 +126,7 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
         Card card = cards.findById(cardId)
                 .orElseThrow(() -> new NotFoundException("Card not found"));
 
+        cache.evict(cardId, card.getVersion());
         card.activate();
     }
 
@@ -125,10 +134,10 @@ public class CardServiceImpl implements CardQueryService, CardAdminService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long cardId) {
-        if (!cards.existsById(cardId))
-            throw new NotFoundException("Card not found");
-
-        cards.deleteById(cardId);
+        Card card = cards.findById(cardId)
+                .orElseThrow(() -> new NotFoundException("Card not found"));
+        cache.evict(cardId, card.getVersion());
+        cards.delete(card);
     }
 
 }
