@@ -15,11 +15,10 @@ import java.time.Duration;
 public class CacheConfig {
     @Bean
     RedisCacheManagerBuilderCustomizer transactionAwareCache() {
-        return builder ->
-                builder
-                        .transactionAware()
-                        .cacheDefaults(RedisCacheConfiguration
-                                .defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(5)));
+        return builder -> builder
+                .transactionAware()
+                .cacheDefaults(RedisCacheConfiguration
+                        .defaultCacheConfig()
+                        .entryTtl(Duration.ofMinutes(5)));
     }
 }
