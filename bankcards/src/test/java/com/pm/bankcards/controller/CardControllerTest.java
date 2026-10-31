@@ -1,14 +1,11 @@
 package com.pm.bankcards.controller;
 
-import com.pm.bankcards.security.CustomUserDetailsService;
-import com.pm.bankcards.security.JwtAuthFilter;
-import com.pm.bankcards.security.JwtTokenService;
-import com.pm.bankcards.security.RoleName;
+import com.pm.bankcards.security.*;
 import com.pm.bankcards.service.api.CardQueryService;
 import com.pm.bankcards.dto.card.CardResponse;
-import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.service.api.DatabaseSeeder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,7 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -31,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CardController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WithMockUser(username = "user", roles = "USER")
 class CardControllerTest {
 
     @Autowired
@@ -52,6 +48,12 @@ class CardControllerTest {
     @MockBean
     DatabaseSeeder databaseSeeder;
 
+    @AfterEach
+    void clearSecurityContext() {
+        // Clear the authentication set manually by this test to keep subsequent tests isolated.
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
     void shouldReturnPagedCards() throws Exception {
         var card = new CardResponse(
@@ -71,12 +73,13 @@ class CardControllerTest {
 
         // Create principal with id
         var principal = new UsernamePasswordAuthenticationToken(
-                new Object() {
-                    public Long id = 1L;
-                },
+                new AuthUser(1L, "user", "unused",
+                        List.of(new SimpleGrantedAuthority(String.valueOf(RoleName.USER))), true),
                 null,
-                List.of(new SimpleGrantedAuthority("USER"))
+                List.of(new SimpleGrantedAuthority(String.valueOf(RoleName.USER)))
         );
+
+        SecurityContextHolder.getContext().setAuthentication(principal);
 
         mvc.perform(get("/api/v1/cards")
                         .accept(MediaType.APPLICATION_JSON)
