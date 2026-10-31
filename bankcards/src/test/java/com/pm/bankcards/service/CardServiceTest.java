@@ -14,7 +14,6 @@ import com.pm.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -43,7 +42,9 @@ class CardServiceTest {
     @Mock
     private EncryptionService encryption;
 
-    @InjectMocks
+    @Mock
+    private CardDetailsCache cache;
+
     private CardServiceImpl cardService;
 
     private User user;
@@ -54,6 +55,7 @@ class CardServiceTest {
 
     @BeforeEach
     void setUp() {
+        cardService = new CardServiceImpl(cardRepository, cardMapper, encryption, cache);
         user = new User();
         user.setUsername("testuser");
 
@@ -126,18 +128,18 @@ class CardServiceTest {
 
     @Test
     void requestBlockCardSuccess() {
-        when(cardRepository.findByIdAndOwnerId(1L, user.getId())).thenReturn(Optional.of(card));
+        when(cardRepository.lockByIdAndOwnerId(1L, user.getId())).thenReturn(Optional.of(card));
 
         cardService.requestBlock(1L, user.getId());
 
         assertThat(card.getStatus()).isEqualTo(CardStatus.BLOCKED);
-        verify(cardRepository).findByIdAndOwnerId(1L, user.getId());
+        verify(cardRepository).lockByIdAndOwnerId(1L, user.getId());
     }
 
     @Test
     void requestBlockCardAlreadyBlockedFails() {
         card.setStatus(CardStatus.BLOCKED);
-        when(cardRepository.findByIdAndOwnerId(1L, user.getId())).thenReturn(Optional.of(card));
+        when(cardRepository.lockByIdAndOwnerId(1L, user.getId())).thenReturn(Optional.of(card));
 
         assertThatThrownBy(() -> cardService.requestBlock(1L, user.getId()))
                 .isInstanceOf(BusinessException.class)
