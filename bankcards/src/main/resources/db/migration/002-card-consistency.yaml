@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-card-consistency
+      author: pm
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - columnExists:
+                tableName: cards
+                columnName: version
+      changes:
+        - addColumn:
+            tableName: cards
+            columns:
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - dropNotNullConstraint:
+            tableName: transfers
+            columnName: from_card_id
+            columnDataType: BIGINT
+
+  - changeSet:
+      id: 002-allow-top-up-source
+      author: pm
+      changes:
+        - dropNotNullConstraint:
+            tableName: transfers
+            columnName: from_card_id
+            columnDataType: BIGINT
