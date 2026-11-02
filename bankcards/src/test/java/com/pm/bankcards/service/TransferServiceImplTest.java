@@ -6,12 +6,14 @@ import com.pm.bankcards.security.CardStatus;
 import com.pm.bankcards.entity.Transfer;
 import com.pm.bankcards.entity.User;
 import com.pm.bankcards.exception.BusinessException;
+import com.pm.bankcards.exception.ErrorCodes;
 import com.pm.bankcards.repository.CardRepository;
 import com.pm.bankcards.repository.TransferRepository;
 import com.pm.bankcards.service.impl.TransferServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,7 +34,7 @@ class TransferServiceImplTest {
     void setUp() {
         cardRepo = mock(CardRepository.class);
         transferRepo = mock(TransferRepository.class);
-        service = new TransferServiceImpl(transferRepo, cardRepo, List.of()); // правила не тестируем здесь
+        service = new TransferServiceImpl(transferRepo, cardRepo, List.of(), mock(CardDetailsCache.class));
     }
 
     @Test
@@ -61,6 +63,8 @@ class TransferServiceImplTest {
     void shouldReturnExistingTransferWhenIdempotent() {
         var req = new TransferRequest(10L, 20L, new BigDecimal("30.00"), "rid-2");
         var existing = new Transfer();
+        existing.setFromCard(cardOf(USER_ID, CardStatus.ACTIVE, "70.00"));
+        existing.setToCard(cardOf(USER_ID, CardStatus.ACTIVE, "40.00"));
         existing.setAmount(new BigDecimal("30.00"));
         existing.setRequestId("rid-2");
 
@@ -83,13 +87,35 @@ class TransferServiceImplTest {
 
         assertThatThrownBy(() -> service.doOwnTransfer(req, USER_ID))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Карта отправителя не найдена");
+                .extracting(error -> ((BusinessException) error).getCode())
+                .isEqualTo(ErrorCodes.CARD_NOT_FOUND_OR_NOT_OWNED);
 
         verify(transferRepo, never()).save(any());
     }
 
+    @Test
+    void reverseTransferLocksCardsInAscendingIdOrder() {
+        var req = new TransferRequest(20L, 10L, new BigDecimal("30.00"), "reverse");
+        var from = cardOf(USER_ID, CardStatus.ACTIVE, "100.00");
+        var to = cardOf(USER_ID, CardStatus.ACTIVE, "10.00");
+
+        when(cardRepo.lockByIdAndOwnerId(10L, USER_ID)).thenReturn(Optional.of(to));
+        when(cardRepo.lockByIdAndOwnerId(20L, USER_ID)).thenReturn(Optional.of(from));
+        when(transferRepo.save(any(Transfer.class))).thenAnswer(call -> call.getArgument(0));
+
+        service.doOwnTransfer(req, USER_ID);
+
+        var order = inOrder(cardRepo);
+        order.verify(cardRepo).lockByIdAndOwnerId(10L, USER_ID);
+        order.verify(cardRepo).lockByIdAndOwnerId(20L, USER_ID);
+
+        assertThat(from.getBalance()).isEqualByComparingTo("70.00");
+        assertThat(to.getBalance()).isEqualByComparingTo("40.00");
+    }
+
     private static Card cardOf(Long ownerId, CardStatus status, String balance) {
         var owner = new User();
+        ReflectionTestUtils.setField(owner, "id", ownerId);
         owner.setUsername("u" + ownerId);
         owner.setPasswordHash("x");
         owner.setEnabled(true);
@@ -102,6 +128,7 @@ class TransferServiceImplTest {
         c.setCardNumberEnc("enc-4242");
         c.setExpiryMonth(12);
         c.setExpiryYear(2030);
+
         return c;
     }
 }
