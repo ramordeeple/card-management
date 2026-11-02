@@ -265,6 +265,105 @@ POST http://localhost:8080/api/v1/cards/load-test/1
 
 *During the test, the Grafana charts will show a spike in activity.*
 
+---
+
+## Local Monitoring: Prometheus and Grafana
+
+The following steps use `PROMETHEUS_PORT=9090` and `GRAFANA_PORT=3000` from `.env`. If you change these values, use the corresponding ports in your browser.
+
+### 1. Start the application and monitoring services
+
+Run this command from the project root, where `docker-compose.yml` is located:
+
+```bash
+docker compose up -d --build
+```
+
+Wait for the application to start. Prometheus collects its metrics every 2 seconds.
+
+### 2. Open Prometheus and check the metrics
+
+1. Open [http://localhost:9090](http://localhost:9090). No login is required.
+2. Open **Status → Targets**, or go directly to [http://localhost:9090/targets](http://localhost:9090/targets).
+3. Find the `spring-actuator` target. Its endpoint is `http://app:8080/actuator/prometheus`, and its state should be **UP**.
+4. Return to the query page, enter the following expression, and click **Execute**:
+
+   ```promql
+   up{job="spring-actuator"}
+   ```
+
+   The result should be `1`, which means Prometheus can collect metrics from the application.
+
+5. To view JVM heap usage, replace the expression with the following query, click **Execute**, and select **Graph**:
+
+   ```promql
+   jvm_memory_used_bytes{application="bank-cards-service",area="heap"}
+   ```
+
+   Select a recent time range, such as the last 15 minutes. After a fresh start, allow a few scrapes for points to appear.
+
+### 3. Open Grafana and connect Prometheus
+
+1. Open [http://localhost:3000](http://localhost:3000).
+2. Log in with username `admin` and password `admin`. If you have already changed the password, use your current one.
+3. Complete the initial password prompt if it appears.
+4. Open **Connections → Data sources → Add new data source** and select **Prometheus**.
+5. Enter these settings:
+
+   | Field | Value |
+   | --- | --- |
+   | Name | `prometheus` |
+   | Prometheus server URL | `http://prometheus:9090` |
+   | Scrape interval, under Interval behavior | `2s` |
+
+6. Enable **Default** so this source is selected for new queries.
+7. Click **Save & test**. The expected message is **Successfully queried the Prometheus API**.
+
+Grafana connects to Prometheus through the Docker Compose service name `prometheus`. Inside the Grafana container, `localhost` refers to Grafana itself. Use `http://prometheus:9090` in the data source settings and `http://localhost:9090` in your browser.
+
+If the `prometheus` data source already exists, open it and check these settings instead of creating another one.
+
+### 4. Import and open the JVM dashboard
+
+1. Open **Dashboards → New → Import**.
+2. In the field for a Grafana.com dashboard URL or ID, enter `4701` and click **Load**. This imports the [JVM (Micrometer) dashboard](https://grafana.com/grafana/dashboards/4701-jvm-micrometer/).
+3. When Grafana asks you to choose a Prometheus data source, select `prometheus`.
+4. Click **Import**.
+5. At the top of the dashboard, select these filters:
+
+   | Filter | Value |
+   | --- | --- |
+   | Application | `bank-cards-service` |
+   | Instance | `app:8080` |
+
+6. Set the time range to **Last 15 minutes** and the refresh interval to **5s**.
+7. Click **Refresh**. JVM memory, CPU, threads, and uptime panels should now show data.
+8. Save the dashboard. To reopen it later, go to **Dashboards** and select **JVM (Micrometer)**.
+
+### 5. Troubleshoot empty panels
+
+If the dashboard shows **No data**, first check that the Prometheus target is **UP**, **Save & test** succeeds in Grafana, and both dashboard filters match the values above.
+
+To check a query directly in Grafana, open **Explore**, select the `prometheus` data source, switch the query editor to **Code**, enter the following expression, and click **Run query**:
+
+```promql
+jvm_memory_used_bytes{application="bank-cards-service",instance="app:8080"}
+```
+
+If Explore returns data but the imported panels remain empty, check for unresolved data source references. This can happen when an older dashboard template is imported into a newer Grafana version:
+
+1. Open **Connections → Data sources → prometheus** and copy the data source UID from the page URL. For example, in `/connections/datasources/edit/abc123`, the UID is `abc123`.
+2. Return to the dashboard and click **Edit → Dashboard options → Settings** (or **View all settings**) → **JSON Model**.
+3. Search the JSON for the literal placeholder `${DS_PROMETHEUS}`. If it exists, replace every occurrence with the UID from step 1, keeping the surrounding JSON quotes. This includes references inside both panels and their query targets.
+4. Click **Save changes**, save the dashboard if prompted, and exit edit mode.
+5. Select **Application = bank-cards-service**, **Instance = app:8080**, and **Last 15 minutes**, then refresh the dashboard.
+
+Basic JVM graphs appear while the application is running. HTTP panels need requests to the application, and some optional panels in the template require additional metrics that this project does not expose.
+
+The current Compose configuration stores Grafana settings inside its container. If that container is removed and recreated, repeat the data source and dashboard setup.
+
+For more details, see the Grafana documentation for [Prometheus data sources](https://grafana.com/docs/grafana/latest/datasources/prometheus/configure/), [dashboard imports](https://grafana.com/docs/grafana/latest/visualizations/dashboards/build-dashboards/import-dashboards/), and [editing the dashboard JSON model](https://grafana.com/docs/grafana/latest/visualizations/dashboards/build-dashboards/view-dashboard-json-model/).
+
 
 
 
